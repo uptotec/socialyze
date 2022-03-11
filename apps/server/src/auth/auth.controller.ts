@@ -1,11 +1,19 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { AuthService } from './auth.service';
 import { jwtResponse } from './jwt.interface';
-import { SignUpStep1Dto, SignUpStep2Dto } from './dto/signUp.dto';
+import { SignUpStep1Dto, signUpStep2Dto } from './dto/signUp.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './getUser.decorator';
 import { User } from 'src/schema/user/user.schema';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class AuthController {
@@ -18,11 +26,13 @@ export class AuthController {
 
   @Post('/signup/step2')
   @UseGuards(AuthGuard())
+  @UseInterceptors(FileInterceptor('photo'))
   async signUpStep2(
-    @Body() profileInfo: SignUpStep2Dto,
+    @Body() profileInfo: signUpStep2Dto,
     @GetUser() user: User,
+    @UploadedFile() profilePic: Express.MulterS3.File,
   ): Promise<void> {
-    return this.authService.signUpStep2(profileInfo, user);
+    return this.authService.signUpStep2(profileInfo, profilePic, user);
   }
 
   @Post('/signin')

@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { userSchema, User } from '../schema/user/user.schema';
+import { PhotoModule } from '../photo/photo.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { userSchema, User } from '../schema/user/user.schema';
         };
       },
     }),
+    PhotoModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

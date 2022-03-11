@@ -1,5 +1,6 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import { ExcludeProperty } from 'nestjs-mongoose-exclude';
 
 export type UserDocument = User & mongoose.Document;
 
@@ -8,11 +9,16 @@ const Photo = new mongoose.Schema({
   name: String,
 });
 
-@Schema()
+@Schema({
+  toJSON: {
+    virtuals: true,
+  },
+})
 export class User {
   _id: mongoose.Schema.Types.ObjectId;
 
   @Prop({ default: false })
+  @ExcludeProperty()
   completeProfile: boolean;
 
   @Prop()
@@ -20,6 +26,8 @@ export class User {
 
   @Prop()
   lastName: string;
+
+  fullName: string;
 
   @Prop()
   bio: string;
@@ -37,7 +45,10 @@ export class User {
   photos: Record<string, any>[];
 
   @Prop()
+  @ExcludeProperty()
   birthDay: Date;
+
+  age: number;
 
   @Prop()
   university: string;
@@ -55,22 +66,52 @@ export class User {
   interests: string[];
 
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  @ExcludeProperty()
   likes: User[];
 
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  @ExcludeProperty()
   dislikes: User[];
 
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  @ExcludeProperty()
   matches: User[];
 
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  @ExcludeProperty()
   blocks: User[];
 
   @Prop({ unique: true, required: true })
+  @ExcludeProperty()
   email: string;
 
   @Prop({ required: true })
+  @ExcludeProperty()
   password: string;
 }
 
-export const userSchema = SchemaFactory.createForClass(User);
+const userSchema = SchemaFactory.createForClass(User);
+
+userSchema.virtual('fullName').get(function (this: UserDocument) {
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+  return `${capitalizeFirstLetter(
+    this.firstName,
+  )} ${capitalizeFirstLetter(this.lastName)}`;
+});
+
+userSchema.virtual('age').get(function (this: UserDocument) {
+  let today = new Date();
+  let birthDate = new Date(this.birthDay);
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  let m = today.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+});
+
+export { userSchema };

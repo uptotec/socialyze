@@ -6,6 +6,7 @@
   "files": [
     "base.json",
     "nestjs.json",
-    "electronjs.json"
+    "electronjs.json",
+    "expo.json"
   ]
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -12,7 +13,7 @@ import { Model } from 'mongoose';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { jwtPayload, jwtResponse } from './jwt.interface';
 import { User, UserDocument } from '../schema/user/user.schema';
-import { SignUpStep1Dto, SignUpStep2Dto } from './dto/signUp.dto';
+import { SignUpStep1Dto, signUpStep2Dto } from './dto/signUp.dto';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +36,7 @@ export class AuthService {
   }
 
   async signUpStep1(credentials: SignUpStep1Dto): Promise<jwtResponse> {
-    const { email, password } = credentials;
+    const { email, password, university } = credentials;
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -43,7 +44,7 @@ export class AuthService {
     const newUser = new this.UserModel({
       email,
       password: hashedPassword,
-      university: credentials.university,
+      university: university,
     });
 
     try {
@@ -60,21 +61,26 @@ export class AuthService {
     return this.signJWT(newUser);
   }
 
-  async signUpStep2(profileInfo: SignUpStep2Dto, user: User): Promise<void> {
-    if (user.completeProfile) throw new UnauthorizedException();
+  async signUpStep2(
+    profileInfo: signUpStep2Dto,
+    profilePic: Express.MulterS3.File,
+    { _id, completeProfile }: User,
+  ): Promise<void> {
+    if (completeProfile) throw new UnauthorizedException();
+    if (!profilePic) throw new BadRequestException();
 
-    const as = await this.UserModel.updateOne(
-      { _id: user._id, completeProfile: false },
-      {
-        completeProfile: true,
-        firstName: profileInfo.firstName,
-        lastName: profileInfo.lastName,
-        bio: profileInfo.bio.replace(/(\r\n|\n|\r)/gm, ''),
-        birthDay: profileInfo.birthDay,
-        faculty: profileInfo.faculty,
-        interests: profileInfo.interests,
-      },
-    );
+    const user = await this.UserModel.findOne({ _id });
+
+    user.completeProfile = true;
+    user.firstName = profileInfo.firstName.toLowerCase();
+    user.lastName = profileInfo.lastName.toLowerCase();
+    user.bio = profileInfo.bio.replace(/(\r\n|\n|\r)/gm, '');
+    user.birthDay = profileInfo.birthDay;
+    user.faculty = profileInfo.faculty;
+    user.interests = profileInfo.interests;
+    user.profilePhoto = { name: profilePic.key, url: profilePic.location };
+
+    await user.save();
   }
 
   async signIn(credentials: AuthCredentialsDto): Promise<jwtResponse> {

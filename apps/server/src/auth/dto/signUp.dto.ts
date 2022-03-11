@@ -8,7 +8,7 @@ import {
   IsDateString,
 } from 'class-validator';
 
-export class SignUpStep2Dto {
+export class signUpStep2Dto {
   @IsNotEmpty()
   @Length(2, 26)
   firstName: string;
