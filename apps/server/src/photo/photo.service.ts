@@ -12,6 +12,7 @@ export class PhotoService {
     endpoint: this.configService.get<string>('s3_endpoint'),
     accessKeyId: this.configService.get<string>('s3_AccessKeyId'),
     secretAccessKey: this.configService.get<string>('s3_secretAccessKey'),
+    s3ForcePathStyle: true,
   });
 
   deletePhoto(name: string): Promise<void> {

@@ -18,12 +18,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-
   @Post('/signup/step1')
   async signUpStep1(@Body() credentials: SignUpStep1Dto): Promise<jwtResponse> {
     return this.authService.signUpStep1(credentials);
   }
-
   @Post('/signup/step2')
   @UseGuards(AuthGuard())
   @UseInterceptors(FileInterceptor('photo'))
@@ -34,7 +32,6 @@ export class AuthController {
   ): Promise<void> {
     return this.authService.signUpStep2(profileInfo, profilePic, user);
   }
-
   @Post('/signin')
   async signIn(@Body() credentials: AuthCredentialsDto): Promise<jwtResponse> {
     return this.authService.signIn(credentials);
