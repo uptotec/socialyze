@@ -24,4 +24,12 @@ export class PhotoService {
     );
     return;
   }
+
+  async getPhotoUrl(key: string) {
+    return this.s3.getSignedUrlPromise('getObject', {
+      Bucket: this.bucket,
+      Key: key,
+      Expires: 60 * 1,
+    });
+  }
 }

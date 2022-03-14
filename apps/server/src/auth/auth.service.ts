@@ -64,12 +64,9 @@ export class AuthService {
   async signUpStep2(
     profileInfo: signUpStep2Dto,
     profilePic: Express.MulterS3.File,
-    { _id, completeProfile }: User,
+    user: UserDocument,
   ): Promise<void> {
-    if (completeProfile) throw new UnauthorizedException();
     if (!profilePic) throw new BadRequestException();
-
-    const user = await this.UserModel.findOne({ _id });
 
     user.completeProfile = true;
     user.firstName = profileInfo.firstName.toLowerCase();
@@ -78,7 +75,10 @@ export class AuthService {
     user.birthDay = profileInfo.birthDay;
     user.faculty = profileInfo.faculty;
     user.interests = profileInfo.interests;
-    user.profilePhoto = { name: profilePic.key, url: profilePic.location };
+    user.profilePhoto = {
+      name: profilePic.key,
+      url: `/profile/photo/${profilePic.key}`,
+    };
 
     await user.save();
   }

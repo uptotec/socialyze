@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Res,
   UploadedFile,
   UploadedFiles,
   UseGuards,
@@ -14,9 +15,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/getUser.decorator';
 import { EditProfileDto } from './dto/editProfile.dto';
 import { ProfileService } from './profile.service';
-import { User } from 'src/schema/user/user.schema';
+import { User, UserDocument } from 'src/schema/user/user.schema';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { DeletePhotoDto } from './dto/deletePhoto.dto';
+import { Response } from 'express';
 
 @Controller('profile')
 @UseGuards(AuthGuard())
@@ -24,19 +26,19 @@ export class ProfileController {
   constructor(private profileService: ProfileService) {}
 
   @Get('/my')
-  async getMyProfile(@GetUser() user: User): Promise<User> {
-    return this.profileService.getMyProfile(user);
+  async getMyProfile(@GetUser() user: UserDocument): Promise<User> {
+    return user;
   }
 
   @Get('/:id')
-  async getProfileById(@Param('id') id: string, @GetUser() user: User) {
+  async getProfileById(@Param('id') id: string, @GetUser() user: UserDocument) {
     return this.profileService.getProfileById(id, user);
   }
 
   @Post()
   async editMyProfile(
     @Body() editProfileDto: EditProfileDto,
-    @GetUser() user: User,
+    @GetUser() user: UserDocument,
   ): Promise<void> {
     return this.profileService.editProfile(editProfileDto, user);
   }
@@ -45,7 +47,7 @@ export class ProfileController {
   @UseInterceptors(FileInterceptor('photo'))
   async uploadProfilePhoto(
     @UploadedFile() file: Express.MulterS3.File,
-    @GetUser() user: User,
+    @GetUser() user: UserDocument,
   ): Promise<void> {
     return this.profileService.uploadProfilePhoto(file, user);
   }
@@ -54,7 +56,7 @@ export class ProfileController {
   @UseInterceptors(FilesInterceptor('photos', 5))
   async uploadPhotos(
     @UploadedFiles() files: Array<Express.MulterS3.File>,
-    @GetUser() user: User,
+    @GetUser() user: UserDocument,
   ): Promise<void> {
     return this.profileService.uploadPhotos(files, user);
   }
@@ -62,8 +64,17 @@ export class ProfileController {
   @Delete('/deletePhotos')
   async deletePhotos(
     @Body() photos: DeletePhotoDto,
-    @GetUser() user: User,
+    @GetUser() user: UserDocument,
   ): Promise<void> {
     return this.profileService.deletePhotos(photos, user);
+  }
+
+  @Get('/photo/:id')
+  async getPhoto(
+    @Param('id') id: string,
+    @GetUser() user: UserDocument,
+    @Res() res: Response,
+  ) {
+    return await this.profileService.getPhoto(id, user, res);
   }
 }

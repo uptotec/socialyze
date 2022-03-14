@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { UserDocument, User } from 'src/schema/user/user.schema';
 import { PhotoService } from '../photo/photo.service';
 import { DeletePhotoDto } from './dto/deletePhoto.dto';
+import { Response } from 'express';
 
 @Injectable()
 export class ProfileService {
@@ -25,10 +26,6 @@ export class ProfileService {
     );
   }
 
-  async getMyProfile({ _id }: User) {
-    return this.getProfile(_id.toString());
-  }
-
   async getProfileById(id: string, { _id }: User): Promise<User> {
     const user = await this.getProfile(id);
 
@@ -40,10 +37,8 @@ export class ProfileService {
 
   async editProfile(
     editProfileDto: EditProfileDto,
-    { _id }: User,
+    user: UserDocument,
   ): Promise<void> {
-    const user = await this.UserModel.findOne(_id);
-
     user.firstName = editProfileDto.firstName
       ? editProfileDto.firstName
       : user.firstName;
@@ -73,27 +68,23 @@ export class ProfileService {
 
   async uploadProfilePhoto(
     file: Express.MulterS3.File,
-    { _id }: User,
+    user: UserDocument,
   ): Promise<void> {
-    const user = await this.UserModel.findOne(_id);
-
     if (user.profilePhoto) {
       this.photoService.deletePhoto(user.profilePhoto.name);
     }
 
     user.profilePhoto = {
       name: file.key,
-      url: file.location,
+      url: `/profile/photo/${file.key}`,
     };
     await user.save();
   }
 
   async uploadPhotos(
     files: Array<Express.MulterS3.File>,
-    { _id }: User,
+    user: UserDocument,
   ): Promise<void> {
-    const user = await this.UserModel.findOne(_id);
-
     if (user.photos.length + files.length > 5) {
       for (const file of files) {
         this.photoService.deletePhoto(file.key);
@@ -102,15 +93,16 @@ export class ProfileService {
     }
 
     for (const file of files) {
-      user.photos.push({ name: file.key, url: file.location });
+      user.photos.push({ name: file.key, url: `/profile/photo/${file.key}` });
     }
 
     await user.save();
   }
 
-  async deletePhotos({ photos }: DeletePhotoDto, { _id }: User): Promise<void> {
-    const user = await this.UserModel.findOne(_id);
-
+  async deletePhotos(
+    { photos }: DeletePhotoDto,
+    user: UserDocument,
+  ): Promise<void> {
     for (const photo of photos) {
       const p = user.photos.find((p) => p.name === photo);
       if (!p) {
@@ -129,5 +121,23 @@ export class ProfileService {
     }
 
     await user.save();
+  }
+
+  async getPhoto(id: string, user: UserDocument, res: Response) {
+    const photoOwner = await this.UserModel.findOne({
+      $or: [{ 'profilePhoto.name': id }, { 'photos.name': id }],
+    });
+
+    if (
+      !photoOwner ||
+      photoOwner.blocks.find((u) => u.toString() === user._id.toString())
+    )
+      throw new NotFoundException();
+
+    const url = await this.photoService.getPhotoUrl(id);
+    res.header('Authorization', null);
+    if (process.env.NODE_ENV === 'development')
+      res.redirect(302, url.replace('s3', '0.0.0.0'));
+    else res.redirect(303, url);
   }
 }

@@ -17,9 +17,12 @@ export class MulterConfigService implements MulterOptionsFactory {
       storage: multerS3({
         s3: this.photoService.s3,
         bucket: this.photoService.bucket,
-        acl: 'public-read',
+        acl: 'private',
         key: function (_request, file, cb) {
           cb(null, uuidv4() + path.extname(file.originalname));
+        },
+        contentType: (req, file, cb) => {
+          cb(null, file.mimetype);
         },
       }),
       fileFilter: (req, file, cb) => {

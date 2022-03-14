@@ -29,9 +29,10 @@ services:
     ports:
       - "27017:27017"
     command: mongod --smallfiles --logpath=/dev/null # --quiet
-  
+
   s3:
     image: minio/minio
+    container_name: s3
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -41,7 +42,7 @@ services:
       MINIO_ACCESS_KEY: accessKey
       MINIO_SECRET_KEY: secretKey
     command: server /data --address "0.0.0.0:9000" --console-address ":9001"
-
+    
 volumes:
   mongodb_data_container:
   minio_data_container:

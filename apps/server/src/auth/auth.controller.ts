@@ -12,7 +12,7 @@ import { jwtResponse } from './jwt.interface';
 import { SignUpStep1Dto, signUpStep2Dto } from './dto/signUp.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './getUser.decorator';
-import { User } from 'src/schema/user/user.schema';
+import { UserDocument } from 'src/schema/user/user.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
@@ -27,7 +27,7 @@ export class AuthController {
   @UseInterceptors(FileInterceptor('photo'))
   async signUpStep2(
     @Body() profileInfo: signUpStep2Dto,
-    @GetUser() user: User,
+    @GetUser() user: UserDocument,
     @UploadedFile() profilePic: Express.MulterS3.File,
   ): Promise<void> {
     return this.authService.signUpStep2(profileInfo, profilePic, user);

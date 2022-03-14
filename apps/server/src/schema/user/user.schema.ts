@@ -1,6 +1,9 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { ExcludeProperty } from 'nestjs-mongoose-exclude';
+import { Intrest } from '../intrest/intrest.schema';
+import { Faculty } from '../university/faculty.schema';
+import { University } from '../university/university.schema';
 
 export type UserDocument = User & mongoose.Document;
 
@@ -20,6 +23,10 @@ export class User {
   @Prop({ default: false })
   @ExcludeProperty()
   completeProfile: boolean;
+
+  @Prop()
+  @ExcludeProperty()
+  lastActive: Date;
 
   @Prop()
   firstName: string;
@@ -50,34 +57,28 @@ export class User {
 
   age: number;
 
-  @Prop()
-  university: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'University' })
+  university: University | string;
 
-  @Prop()
-  faculty: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Faculty' })
+  faculty: Faculty | string;
 
-  @Prop({
-    type: [String],
-    validate: [
-      (val: Array<string>) => val.length <= 15,
-      '{PATH} exceeds the limit of 15',
-    ],
-  })
-  interests: string[];
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Intrest' }] })
+  interests: Intrest[] | string[];
 
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   @ExcludeProperty()
   likes: User[];
 
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   @ExcludeProperty()
   dislikes: User[];
 
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   @ExcludeProperty()
   matches: User[];
 
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'User' })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   @ExcludeProperty()
   blocks: User[];
 
@@ -112,6 +113,24 @@ userSchema.virtual('age').get(function (this: UserDocument) {
     age--;
   }
   return age;
+});
+
+userSchema.pre('find', function (next) {
+  const user = this;
+  user.populate('interests university faculty');
+  next();
+});
+
+userSchema.pre('findOne', function (next) {
+  const user = this;
+  user.populate('interests university faculty');
+  next();
+});
+
+userSchema.pre('findOneAndUpdate', function (next) {
+  const user = this;
+  user.populate('interests university faculty');
+  next();
 });
 
 export { userSchema };
