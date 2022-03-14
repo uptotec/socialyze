@@ -34,9 +34,6 @@ export class signUpStep2Dto {
 
 export class SignUpStep1Dto {
   @IsNotEmpty()
-  university: string;
-
-  @IsNotEmpty()
   @IsEmail()
   email: string;
 

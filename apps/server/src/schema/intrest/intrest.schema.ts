@@ -1,9 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 
-export type intrestDocument = Intrest & mongoose.Document;
+export type IntrestDocument = Intrest & mongoose.Document;
 
-@Schema()
+@Schema({
+  toJSON: {
+    virtuals: true,
+  },
+})
 export class Intrest {
   _id: mongoose.Schema.Types.ObjectId;
 

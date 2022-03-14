@@ -10,10 +10,11 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { AuthService } from './auth.service';
 import { jwtResponse } from './jwt.interface';
 import { SignUpStep1Dto, signUpStep2Dto } from './dto/signUp.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './getUser.decorator';
 import { UserDocument } from 'src/schema/user/user.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ProfileTypes } from './profileTypes.enum';
+import ProfileTypeGuard from './profileType.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,8 +23,9 @@ export class AuthController {
   async signUpStep1(@Body() credentials: SignUpStep1Dto): Promise<jwtResponse> {
     return this.authService.signUpStep1(credentials);
   }
+
   @Post('/signup/step2')
-  @UseGuards(AuthGuard())
+  @UseGuards(ProfileTypeGuard(ProfileTypes.Uncomplete))
   @UseInterceptors(FileInterceptor('photo'))
   async signUpStep2(
     @Body() profileInfo: signUpStep2Dto,
@@ -32,6 +34,7 @@ export class AuthController {
   ): Promise<void> {
     return this.authService.signUpStep2(profileInfo, profilePic, user);
   }
+
   @Post('/signin')
   async signIn(@Body() credentials: AuthCredentialsDto): Promise<jwtResponse> {
     return this.authService.signIn(credentials);

@@ -58,7 +58,7 @@ export class User {
   age: number;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'University' })
-  university: University | string;
+  university: University;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Faculty' })
   faculty: Faculty | string;

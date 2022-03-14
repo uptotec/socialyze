@@ -18,9 +18,11 @@ export class University {
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Faculty' }] })
   @ExcludeProperty()
-  faculties: Faculty[] | string[];
+  faculties: Faculty[];
 }
 
 const universitySchema = SchemaFactory.createForClass(University);
+
+universitySchema.index({ name: 'text' });
 
 export { universitySchema };

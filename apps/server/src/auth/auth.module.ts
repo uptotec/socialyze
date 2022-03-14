@@ -9,10 +9,18 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { userSchema, User } from '../schema/user/user.schema';
 import { PhotoModule } from '../photo/photo.module';
+import {
+  University,
+  universitySchema,
+} from 'src/schema/university/university.schema';
+import ProfileTypeGuard from './profileType.guard';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: userSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: userSchema },
+      { name: University.name, schema: universitySchema },
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

@@ -14,12 +14,18 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { jwtPayload, jwtResponse } from './jwt.interface';
 import { User, UserDocument } from '../schema/user/user.schema';
 import { SignUpStep1Dto, signUpStep2Dto } from './dto/signUp.dto';
+import {
+  University,
+  UniversityDocument,
+} from 'src/schema/university/university.schema';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name)
     private UserModel: Model<UserDocument>,
+    @InjectModel(University.name)
+    private universityModel: Model<UniversityDocument>,
     private jwtService: JwtService,
   ) {}
 
@@ -36,10 +42,19 @@ export class AuthService {
   }
 
   async signUpStep1(credentials: SignUpStep1Dto): Promise<jwtResponse> {
-    const { email, password, university } = credentials;
+    const { email, password } = credentials;
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    const emailDomain = email.split('@')[1];
+
+    const university = await this.universityModel.findOne({ emailDomain });
+
+    if (!university)
+      throw new UnauthorizedException(
+        'Only selected universities emails are allowed to signup',
+      );
 
     const newUser = new this.UserModel({
       email,

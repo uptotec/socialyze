@@ -11,7 +11,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/getUser.decorator';
 import { EditProfileDto } from './dto/editProfile.dto';
 import { ProfileService } from './profile.service';
@@ -19,9 +18,11 @@ import { User, UserDocument } from 'src/schema/user/user.schema';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { DeletePhotoDto } from './dto/deletePhoto.dto';
 import { Response } from 'express';
+import ProfileTypeGuard from 'src/auth/profileType.guard';
+import { ProfileTypes } from 'src/auth/profileTypes.enum';
 
 @Controller('profile')
-@UseGuards(AuthGuard())
+@UseGuards(ProfileTypeGuard(ProfileTypes.Complete))
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
 
