@@ -2,7 +2,9 @@ version: '3.7'
 services:
   server:
     container_name: server
-    image: mcr.microsoft.com/vscode/devcontainers/typescript-node:0-16-bullseye
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
@@ -11,6 +13,7 @@ services:
     volumes:
       - ..:/workspace:cached
       - ./.zshrc:/home/node/.zshrc
+      - ./.zsh_history:/home/node/.zsh_history
       - ./plugins:/home/node/.oh-my-zsh/custom/plugins
     command: /bin/sh -c "while sleep 1000; do :; done"
 
