@@ -10,6 +10,8 @@ services:
       - mongodb
     volumes:
       - ..:/workspace:cached
+      - ./.zshrc:/home/node/.zshrc
+      - ./plugins:/home/node/.oh-my-zsh/custom/plugins
     command: /bin/sh -c "while sleep 1000; do :; done"
 
   redis:
