@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -15,6 +17,7 @@ import { UserDocument } from 'src/schema/user/user.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileTypes } from './profileTypes.enum';
 import ProfileTypeGuard from './profileType.guard';
+import { ConfirmMailDto } from './dto/confirmMail.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,8 +27,29 @@ export class AuthController {
     return this.authService.signUpStep1(credentials);
   }
 
+  @Post('/confirmMail')
+  @UseGuards(
+    ProfileTypeGuard([ProfileTypes.Uncomplete, ProfileTypes.EmailNotConfirmed]),
+  )
+  async confirmMail(
+    @Body() code: ConfirmMailDto,
+    @GetUser() user: UserDocument,
+  ): Promise<void> {
+    return this.authService.confirmMail(code, user);
+  }
+
+  @Get('/resendConfirmMail')
+  @UseGuards(
+    ProfileTypeGuard([ProfileTypes.Uncomplete, ProfileTypes.EmailNotConfirmed]),
+  )
+  async resendConfirmMail(@GetUser() user: UserDocument) {
+    return this.authService.resendConfirmMail(user);
+  }
+
   @Post('/signup/step2')
-  @UseGuards(ProfileTypeGuard(ProfileTypes.Uncomplete))
+  @UseGuards(
+    ProfileTypeGuard([ProfileTypes.Uncomplete, ProfileTypes.EmailConfirmed]),
+  )
   @UseInterceptors(FileInterceptor('photo'))
   async signUpStep2(
     @Body() profileInfo: signUpStep2Dto,

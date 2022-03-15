@@ -24,6 +24,10 @@ export class User {
   @ExcludeProperty()
   completeProfile: boolean;
 
+  @Prop({ default: false })
+  @ExcludeProperty()
+  isEmailConfirmed: boolean;
+
   @Prop()
   @ExcludeProperty()
   lastActive: Date;

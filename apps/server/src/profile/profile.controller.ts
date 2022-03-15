@@ -22,7 +22,9 @@ import ProfileTypeGuard from 'src/auth/profileType.guard';
 import { ProfileTypes } from 'src/auth/profileTypes.enum';
 
 @Controller('profile')
-@UseGuards(ProfileTypeGuard(ProfileTypes.Complete))
+@UseGuards(
+  ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
+)
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
 

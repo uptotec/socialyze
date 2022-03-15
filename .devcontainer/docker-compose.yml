@@ -3,10 +3,29 @@ services:
   server:
     container_name: server
     build:
-      context: .
+      context: "../apps/server/.devcontainer/"
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    depends_on:
+      - redis
+      - mongodb
+    links:
+      - mobile
+    volumes:
+      - ..:/workspace:cached
+      - ./.zshrc:/home/node/.zshrc
+      - ./.zsh_history:/home/node/.zsh_history
+      - ./plugins:/home/node/.oh-my-zsh/custom/plugins
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+  mobile:
+    container_name: mobile
+    build:
+      context: "../apps/mobile/.devcontainer/"
+      dockerfile: Dockerfile
+    ports:
+      - "19000:19000"
     depends_on:
       - redis
       - mongodb
@@ -47,7 +66,7 @@ services:
       MINIO_ACCESS_KEY: accessKey
       MINIO_SECRET_KEY: secretKey
     command: server /data --address "0.0.0.0:9000" --console-address ":9001"
-    
+
 volumes:
   mongodb_data_container:
   minio_data_container:

@@ -1,10 +1,11 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.217.2/containers/typescript-node
 {
-  "name": "server",
-  "dockerComposeFile": "./docker-compose.yml",
+  "name": "mobile",
+  "dockerComposeFile": "../../../.devcontainer/docker-compose.yml",
   "workspaceFolder": "/workspace",
-  "service": "server",
+  "shutdownAction": "none",
+  "service": "mobile",
   // Set *default* container specific settings.json values on container create.
   "settings": {
     "terminal.integrated.defaultProfile.linux": "zsh"
@@ -19,10 +20,12 @@
   ],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
-    3000
+    19000,
+    19002,
+    19006,
   ],
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "yarn install",
+  "postCreateCommand": "sudo git update-index --assume-unchanged .devcontainer/.zsh_history",
   // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
   "remoteUser": "node"
 }

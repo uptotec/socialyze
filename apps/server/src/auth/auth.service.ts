@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  CACHE_MANAGER,
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -18,6 +20,9 @@ import {
   University,
   UniversityDocument,
 } from 'src/schema/university/university.schema';
+import { MailerService } from '@nestjs-modules/mailer';
+import { Cache } from 'cache-manager';
+import { ConfirmMailDto } from './dto/confirmMail.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,18 +32,27 @@ export class AuthService {
     @InjectModel(University.name)
     private universityModel: Model<UniversityDocument>,
     private jwtService: JwtService,
+    private mailerService: MailerService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   signJWT(user: User): jwtResponse {
     const payload: jwtPayload = {
       _id: user._id.toString(),
       email: user.email,
-      completeProfile: user.completeProfile,
     };
 
     const accessToken: string = this.jwtService.sign(payload);
 
     return { accessToken: accessToken };
+  }
+
+  sendConfirmMail(email: string, code: number) {
+    this.mailerService.sendMail({
+      to: email,
+      subject: 'Welcome to dating - confirm your email',
+      html: `<p>welcome, your confirmation code is ${code}<p>`,
+    });
   }
 
   async signUpStep1(credentials: SignUpStep1Dto): Promise<jwtResponse> {
@@ -73,7 +87,37 @@ export class AuthService {
       }
     }
 
+    const code = Math.floor(100000 + Math.random() * 900000);
+    await this.cacheManager.set(`CODE-${newUser._id}`, code);
+
+    this.sendConfirmMail(newUser.email, code);
+
     return this.signJWT(newUser);
+  }
+
+  async confirmMail(
+    { code }: ConfirmMailDto,
+    user: UserDocument,
+  ): Promise<void> {
+    console.log(code);
+    const storedCode = await this.cacheManager.get(`CODE-${user._id}`);
+    console.log(storedCode);
+    if (!storedCode || storedCode !== code)
+      throw new UnauthorizedException('invalid Code');
+
+    user.isEmailConfirmed = true;
+    await user.save();
+  }
+
+  async resendConfirmMail(user: UserDocument): Promise<void> {
+    const storedCode = await this.cacheManager.get<number>(`CODE-${user._id}`);
+    if (storedCode) {
+      this.sendConfirmMail(user.email, storedCode);
+    } else {
+      const code = Math.floor(100000 + Math.random() * 900000);
+      await this.cacheManager.set(`CODE-${user._id}`, code);
+      this.sendConfirmMail(user.email, code);
+    }
   }
 
   async signUpStep2(

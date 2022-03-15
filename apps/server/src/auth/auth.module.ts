@@ -13,7 +13,6 @@ import {
   University,
   universitySchema,
 } from 'src/schema/university/university.schema';
-import ProfileTypeGuard from './profileType.guard';
 
 @Module({
   imports: [
