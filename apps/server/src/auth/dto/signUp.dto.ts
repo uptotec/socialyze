@@ -10,14 +10,6 @@ import {
 
 export class signUpStep2Dto {
   @IsNotEmpty()
-  @Length(2, 26)
-  firstName: string;
-
-  @IsNotEmpty()
-  @Length(2, 26)
-  lastName: string;
-
-  @IsNotEmpty()
   @Length(100, 280)
   bio: string;
 
@@ -33,6 +25,14 @@ export class signUpStep2Dto {
 }
 
 export class SignUpStep1Dto {
+  @IsNotEmpty()
+  @Length(2, 26)
+  firstName: string;
+
+  @IsNotEmpty()
+  @Length(2, 26)
+  lastName: string;
+
   @IsNotEmpty()
   @IsEmail()
   email: string;

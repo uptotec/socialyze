@@ -101,3 +101,6 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 DISABLE_AUTO_UPDATE=true
 DISABLE_UPDATE_PROMPT=true
+
+export ANDROID_SDK=$HOME/Android/Sdk
+export PATH=$ANDROID_SDK/emulator:$ANDROID_SDK/tools:$PATH

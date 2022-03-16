@@ -13,6 +13,9 @@ const Photo = new mongoose.Schema({
 });
 
 @Schema({
+  toObject: {
+    virtuals: true,
+  },
   toJSON: {
     virtuals: true,
   },
@@ -27,6 +30,10 @@ export class User {
   @Prop({ default: false })
   @ExcludeProperty()
   isEmailConfirmed: boolean;
+
+  @Prop({ default: false })
+  @ExcludeProperty()
+  resetPassword: boolean;
 
   @Prop()
   @ExcludeProperty()

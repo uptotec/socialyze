@@ -5,6 +5,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -23,6 +24,7 @@ import {
 import { MailerService } from '@nestjs-modules/mailer';
 import { Cache } from 'cache-manager';
 import { ConfirmMailDto } from './dto/confirmMail.dto';
+import { ChangePasswordDto } from './dto/changePassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -47,16 +49,32 @@ export class AuthService {
     return { accessToken: accessToken };
   }
 
-  sendConfirmMail(email: string, code: number) {
+  sendConfirmMail(user: User, code: number) {
     this.mailerService.sendMail({
-      to: email,
+      to: user.email,
       subject: 'Welcome to dating - confirm your email',
-      html: `<p>welcome, your confirmation code is ${code}<p>`,
+      template: 'confirmEmail',
+      context: {
+        code: code,
+        fullName: user.fullName,
+      },
+    });
+  }
+
+  sendForgetPassword(user: User, code: number) {
+    this.mailerService.sendMail({
+      to: user.email,
+      subject: 'dating - reset your password',
+      template: 'forgetPassword',
+      context: {
+        code: code,
+        fullName: user.fullName,
+      },
     });
   }
 
   async signUpStep1(credentials: SignUpStep1Dto): Promise<jwtResponse> {
-    const { email, password } = credentials;
+    const { email, password, firstName, lastName } = credentials;
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -73,7 +91,9 @@ export class AuthService {
     const newUser = new this.UserModel({
       email,
       password: hashedPassword,
-      university: university,
+      university,
+      firstName: firstName.toLowerCase(),
+      lastName: lastName.toLowerCase(),
     });
 
     try {
@@ -88,9 +108,9 @@ export class AuthService {
     }
 
     const code = Math.floor(100000 + Math.random() * 900000);
-    await this.cacheManager.set(`CODE-${newUser._id}`, code);
+    await this.cacheManager.set(`CONFIRM-${newUser._id}`, code);
 
-    this.sendConfirmMail(newUser.email, code);
+    this.sendConfirmMail(newUser, code);
 
     return this.signJWT(newUser);
   }
@@ -99,9 +119,7 @@ export class AuthService {
     { code }: ConfirmMailDto,
     user: UserDocument,
   ): Promise<void> {
-    console.log(code);
-    const storedCode = await this.cacheManager.get(`CODE-${user._id}`);
-    console.log(storedCode);
+    const storedCode = await this.cacheManager.get(`CONFIRM-${user._id}`);
     if (!storedCode || storedCode !== code)
       throw new UnauthorizedException('invalid Code');
 
@@ -110,13 +128,15 @@ export class AuthService {
   }
 
   async resendConfirmMail(user: UserDocument): Promise<void> {
-    const storedCode = await this.cacheManager.get<number>(`CODE-${user._id}`);
+    const storedCode = await this.cacheManager.get<number>(
+      `CONFIRM-${user._id}`,
+    );
     if (storedCode) {
-      this.sendConfirmMail(user.email, storedCode);
+      this.sendConfirmMail(user, storedCode);
     } else {
       const code = Math.floor(100000 + Math.random() * 900000);
-      await this.cacheManager.set(`CODE-${user._id}`, code);
-      this.sendConfirmMail(user.email, code);
+      await this.cacheManager.set(`CONFIRM-${user._id}`, code);
+      this.sendConfirmMail(user, code);
     }
   }
 
@@ -128,8 +148,6 @@ export class AuthService {
     if (!profilePic) throw new BadRequestException();
 
     user.completeProfile = true;
-    user.firstName = profileInfo.firstName.toLowerCase();
-    user.lastName = profileInfo.lastName.toLowerCase();
     user.bio = profileInfo.bio.replace(/(\r\n|\n|\r)/gm, '');
     user.birthDay = profileInfo.birthDay;
     user.faculty = profileInfo.faculty;

@@ -18,6 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileTypes } from './profileTypes.enum';
 import ProfileTypeGuard from './profileType.guard';
 import { ConfirmMailDto } from './dto/confirmMail.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -42,6 +43,7 @@ export class AuthController {
   @UseGuards(
     ProfileTypeGuard([ProfileTypes.Uncomplete, ProfileTypes.EmailNotConfirmed]),
   )
+  @Throttle(1, 60)
   async resendConfirmMail(@GetUser() user: UserDocument) {
     return this.authService.resendConfirmMail(user);
   }
