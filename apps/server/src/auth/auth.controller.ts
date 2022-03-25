@@ -12,7 +12,7 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { AuthService } from './auth.service';
 import { jwtResponse } from './jwt.interface';
 import { SignUpStep1Dto, signUpStep2Dto } from './dto/signUp.dto';
-import { GetUser } from './getUser.decorator';
+import { GetUser } from '../utils/decorators/getUser.decorator';
 import { UserDocument } from 'src/schema/user/user.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileTypes } from './profileTypes.enum';

@@ -11,15 +11,17 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { GetUser } from 'src/auth/getUser.decorator';
+import { GetUser } from 'src/utils/decorators/getUser.decorator';
 import { EditProfileDto } from './dto/editProfile.dto';
 import { ProfileService } from './profile.service';
 import { User, UserDocument } from 'src/schema/user/user.schema';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { DeletePhotoDto } from './dto/deletePhoto.dto';
+import { DeletePhotoDto } from '../photo/dto/deletePhoto.dto';
 import { Response } from 'express';
 import ProfileTypeGuard from 'src/auth/profileType.guard';
 import { ProfileTypes } from 'src/auth/profileTypes.enum';
+import { isMongoId } from 'class-validator';
+import { ObjectIdQueryDto } from './dto/objectId.dto';
 
 @Controller('profile')
 @UseGuards(
@@ -34,7 +36,10 @@ export class ProfileController {
   }
 
   @Get('/:id')
-  async getProfileById(@Param('id') id: string, @GetUser() user: UserDocument) {
+  async getProfileById(
+    @Param() { id }: ObjectIdQueryDto,
+    @GetUser() user: UserDocument,
+  ) {
     return this.profileService.getProfileById(id, user);
   }
 
@@ -44,40 +49,5 @@ export class ProfileController {
     @GetUser() user: UserDocument,
   ): Promise<void> {
     return this.profileService.editProfile(editProfileDto, user);
-  }
-
-  @Post('uploadProfilePhoto')
-  @UseInterceptors(FileInterceptor('photo'))
-  async uploadProfilePhoto(
-    @UploadedFile() file: Express.MulterS3.File,
-    @GetUser() user: UserDocument,
-  ): Promise<void> {
-    return this.profileService.uploadProfilePhoto(file, user);
-  }
-
-  @Post('uploadPhotos')
-  @UseInterceptors(FilesInterceptor('photos', 5))
-  async uploadPhotos(
-    @UploadedFiles() files: Array<Express.MulterS3.File>,
-    @GetUser() user: UserDocument,
-  ): Promise<void> {
-    return this.profileService.uploadPhotos(files, user);
-  }
-
-  @Delete('/deletePhotos')
-  async deletePhotos(
-    @Body() photos: DeletePhotoDto,
-    @GetUser() user: UserDocument,
-  ): Promise<void> {
-    return this.profileService.deletePhotos(photos, user);
-  }
-
-  @Get('/photo/:id')
-  async getPhoto(
-    @Param('id') id: string,
-    @GetUser() user: UserDocument,
-    @Res() res: Response,
-  ) {
-    return await this.profileService.getPhoto(id, user, res);
   }
 }
