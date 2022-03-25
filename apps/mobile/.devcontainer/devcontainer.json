@@ -16,16 +16,21 @@
     "ms-azuretools.vscode-docker",
     "esbenp.prettier-vscode",
     "aaron-bond.better-comments",
-    "coenraads.bracket-pair-colorizer"
+    "coenraads.bracket-pair-colorizer",
+    "bycedric.vscode-expo",
+    "msjsdiag.vscode-react-native",
+    "eamodio.gitlens",
+    "mhutchie.git-graph"
   ],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [
-    19000,
-    19002,
-    19006,
-  ],
+  "forwardPorts": [],
+
+  "remoteEnv":{
+    // "REACT_NATIVE_PACKAGER_HOSTNAME": "",
+    // "EXPO_DEVTOOLS_LISTEN_ADDRESS": ""
+  },
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "sudo git update-index --assume-unchanged .devcontainer/.zsh_history",
+  "postCreateCommand": "sudo git update-index --assume-unchanged .devcontainer/.zsh_history && yarn install",
   // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
   "remoteUser": "node"
 }

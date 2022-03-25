@@ -24,8 +24,6 @@ services:
     build:
       context: "../apps/mobile/.devcontainer/"
       dockerfile: Dockerfile
-    ports:
-      - "19000:19000"
     depends_on:
       - redis
       - mongodb
