@@ -20,8 +20,10 @@ import ProfileTypeGuard from './profileType.guard';
 import { ConfirmMailDto } from './dto/confirmMail.dto';
 import { Throttle } from '@nestjs/throttler';
 import JwtRefreshGuard from './jwtRefresh.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('Auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
   @Post('/signup/step1')

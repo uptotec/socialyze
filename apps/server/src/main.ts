@@ -13,7 +13,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('dating backend server')
     .setDescription('dating API description')
-    .addBearerAuth({ type: 'http', bearerFormat: '' })
+    .addBearerAuth()
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

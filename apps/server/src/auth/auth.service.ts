@@ -121,6 +121,13 @@ export class AuthService {
       lastName: lastName.toLowerCase(),
     });
 
+    const jwtPayload = this.signJWT(newUser);
+
+    const salt2 = await bcrypt.genSalt();
+    const hashedToken = await bcrypt.hash(jwtPayload.refreshToken, salt);
+
+    newUser.refreshToken = hashedToken;
+
     try {
       await newUser.save();
     } catch (error: any) {
@@ -137,7 +144,7 @@ export class AuthService {
 
     this.sendConfirmMail(newUser, code);
 
-    return this.signJWT(newUser);
+    return jwtPayload;
   }
 
   async confirmMail(

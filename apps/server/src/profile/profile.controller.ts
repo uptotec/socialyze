@@ -22,11 +22,13 @@ import ProfileTypeGuard from 'src/auth/profileType.guard';
 import { ProfileTypes } from 'src/auth/profileTypes.enum';
 import { isMongoId } from 'class-validator';
 import { ObjectIdQueryDto } from './dto/objectId.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('profile')
 @UseGuards(
   ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
 )
+@ApiTags('profile')
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
 

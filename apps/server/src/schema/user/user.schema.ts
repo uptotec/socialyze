@@ -1,5 +1,5 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiHideProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import * as mongoose from 'mongoose';
 import { ExcludeProperty } from 'nestjs-mongoose-exclude';
 import { Intrest } from '../intrest/intrest.schema';
@@ -31,11 +31,6 @@ export class User {
   @Prop({ default: false })
   @ExcludeProperty()
   isEmailConfirmed: boolean;
-
-  @Prop({ default: false })
-  @ExcludeProperty()
-  @ApiHideProperty()
-  resetPassword: boolean;
 
   @Prop()
   @ExcludeProperty()
