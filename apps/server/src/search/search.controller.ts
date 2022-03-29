@@ -1,8 +1,8 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/utils/decorators/getUser.decorator';
 import { UserDocument } from 'src/schema/user/user.schema';
 import { SearchService } from './search.service';
+import JwtAccessGuard from 'src/auth/jwtAccess.guard';
 
 @Controller('search')
 export class SearchController {
@@ -14,7 +14,7 @@ export class SearchController {
   }
 
   @Get('/faculties')
-  @UseGuards(AuthGuard())
+  @UseGuards(JwtAccessGuard)
   async getFaculties(
     @Query('name') name: string,
     @GetUser() user: UserDocument,
@@ -23,7 +23,7 @@ export class SearchController {
   }
 
   @Get('/intrests')
-  @UseGuards(AuthGuard())
+  @UseGuards(JwtAccessGuard)
   async getIntrests(
     @Query('name') name: string,
     @GetUser() user: UserDocument,

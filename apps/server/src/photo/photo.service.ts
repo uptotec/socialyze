@@ -113,7 +113,9 @@ export class PhotoService {
     if (!photoOwner) throw new NotFoundException();
 
     const url = await this.getPhotoUrl(id);
-    res.header('Authorization', null);
+
+    if (!url) throw new NotFoundException();
+
     if (process.env.NODE_ENV === 'development')
       res.redirect(302, url.replace('s3', '0.0.0.0'));
     else res.redirect(303, url);

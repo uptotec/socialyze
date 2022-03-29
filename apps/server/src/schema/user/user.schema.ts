@@ -1,4 +1,5 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiHideProperty } from '@nestjs/swagger';
 import * as mongoose from 'mongoose';
 import { ExcludeProperty } from 'nestjs-mongoose-exclude';
 import { Intrest } from '../intrest/intrest.schema';
@@ -33,11 +34,18 @@ export class User {
 
   @Prop({ default: false })
   @ExcludeProperty()
+  @ApiHideProperty()
   resetPassword: boolean;
 
   @Prop()
   @ExcludeProperty()
+  @ApiHideProperty()
   lastActive: Date;
+
+  @Prop()
+  @ExcludeProperty()
+  @ApiHideProperty()
+  refreshToken: string;
 
   @Prop()
   firstName: string;
@@ -64,6 +72,7 @@ export class User {
 
   @Prop()
   @ExcludeProperty()
+  @ApiHideProperty()
   birthDay: Date;
 
   age: number;
@@ -79,26 +88,32 @@ export class User {
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   @ExcludeProperty()
+  @ApiHideProperty()
   likes: User[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   @ExcludeProperty()
+  @ApiHideProperty()
   dislikes: User[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   @ExcludeProperty()
+  @ApiHideProperty()
   matches: User[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   @ExcludeProperty()
+  @ApiHideProperty()
   blocks: User[];
 
   @Prop({ unique: true, required: true })
   @ExcludeProperty()
+  @ApiHideProperty()
   email: string;
 
   @Prop({ required: true })
   @ExcludeProperty()
+  @ApiHideProperty()
   password: string;
 }
 

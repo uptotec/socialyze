@@ -6,13 +6,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtAccessStrategy } from './jwtAccessToken.strategy';
 import { userSchema, User } from '../schema/user/user.schema';
 import { PhotoModule } from '../photo/photo.module';
 import {
   University,
   universitySchema,
 } from 'src/schema/university/university.schema';
+import { JwtRefreshStrategy } from './jwtRefreshToken.strategy';
 
 @Module({
   imports: [
@@ -21,22 +22,11 @@ import {
       { name: University.name, schema: universitySchema },
     ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        return {
-          secret: configService.get('JWTSECRET'),
-          signOptions: {
-            expiresIn: 24 * 60 * 60, // one day
-          },
-        };
-      },
-    }),
+    JwtModule.register({}),
     PhotoModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [JwtStrategy, PassportModule],
+  providers: [AuthService, JwtAccessStrategy, JwtRefreshStrategy],
+  exports: [JwtAccessStrategy, JwtRefreshStrategy, PassportModule],
 })
 export class AuthModule {}

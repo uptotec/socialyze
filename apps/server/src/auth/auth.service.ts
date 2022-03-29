@@ -5,7 +5,6 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -14,7 +13,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { jwtPayload, jwtResponse } from './jwt.interface';
+import { JwtPayload, JwtResponse } from './dto/jwt.dto';
 import { User, UserDocument } from '../schema/user/user.schema';
 import { SignUpStep1Dto, signUpStep2Dto } from './dto/signUp.dto';
 import {
@@ -24,7 +23,7 @@ import {
 import { MailerService } from '@nestjs-modules/mailer';
 import { Cache } from 'cache-manager';
 import { ConfirmMailDto } from './dto/confirmMail.dto';
-import { ChangePasswordDto } from './dto/changePassword.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -36,17 +35,31 @@ export class AuthService {
     private jwtService: JwtService,
     private mailerService: MailerService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private configService: ConfigService,
   ) {}
 
-  signJWT(user: User): jwtResponse {
-    const payload: jwtPayload = {
+  signJWT(user: User): JwtResponse {
+    const payload: JwtPayload = {
       _id: user._id.toString(),
       email: user.email,
     };
 
-    const accessToken: string = this.jwtService.sign(payload);
+    const accessToken: string = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_ACCESS_SECRET'),
+      expiresIn: '30m',
+    });
 
-    return { accessToken: accessToken };
+    const refreshToken: string = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_REFRESH_SECRET'),
+      expiresIn: '90 days',
+    });
+
+    return {
+      isEmailConfirmed: user.isEmailConfirmed,
+      iscompleteProfile: user.completeProfile,
+      accessToken,
+      refreshToken,
+    };
   }
 
   sendConfirmMail(user: User, code: number) {
@@ -73,7 +86,19 @@ export class AuthService {
     });
   }
 
-  async signUpStep1(credentials: SignUpStep1Dto): Promise<jwtResponse> {
+  async RefreshAccessToken(user: UserDocument) {
+    const jwtPayload = this.signJWT(user);
+
+    const salt = await bcrypt.genSalt();
+    const hashedToken = await bcrypt.hash(jwtPayload.refreshToken, salt);
+
+    user.refreshToken = hashedToken;
+    await user.save();
+
+    return jwtPayload;
+  }
+
+  async signUpStep1(credentials: SignUpStep1Dto): Promise<JwtResponse> {
     const { email, password, firstName, lastName } = credentials;
 
     const salt = await bcrypt.genSalt();
@@ -160,7 +185,7 @@ export class AuthService {
     await user.save();
   }
 
-  async signIn(credentials: AuthCredentialsDto): Promise<jwtResponse> {
+  async signIn(credentials: AuthCredentialsDto): Promise<JwtResponse> {
     const { email, password } = credentials;
 
     const user = await this.UserModel.findOne({ email });
@@ -168,6 +193,14 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(password, user.password)))
       throw new UnauthorizedException('wrong credentials');
 
-    return this.signJWT(user);
+    const jwtPayload = this.signJWT(user);
+
+    const salt = await bcrypt.genSalt();
+    const hashedToken = await bcrypt.hash(jwtPayload.refreshToken, salt);
+
+    user.refreshToken = hashedToken;
+    await user.save();
+
+    return jwtPayload;
   }
 }

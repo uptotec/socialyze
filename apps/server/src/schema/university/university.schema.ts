@@ -5,7 +5,14 @@ import { Faculty } from './faculty.schema';
 
 export type UniversityDocument = University & mongoose.Document;
 
-@Schema()
+@Schema({
+  toObject: {
+    virtuals: true,
+  },
+  toJSON: {
+    virtuals: true,
+  },
+})
 export class University {
   _id: mongoose.Schema.Types.ObjectId;
 
