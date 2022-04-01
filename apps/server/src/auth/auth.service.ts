@@ -38,18 +38,18 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  signJWT(user: User): JwtResponse {
+  async signJWT(user: User): Promise<JwtResponse> {
     const payload: JwtPayload = {
       _id: user._id.toString(),
       email: user.email,
     };
 
-    const accessToken: string = this.jwtService.sign(payload, {
+    const accessToken: string = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_ACCESS_SECRET'),
       expiresIn: '30m',
     });
 
-    const refreshToken: string = this.jwtService.sign(payload, {
+    const refreshToken: string = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
       expiresIn: '90 days',
     });
@@ -87,10 +87,11 @@ export class AuthService {
   }
 
   async RefreshAccessToken(user: UserDocument) {
-    const jwtPayload = this.signJWT(user);
+    const jwtPayload = await this.signJWT(user);
 
     const salt = await bcrypt.genSalt();
-    const hashedToken = await bcrypt.hash(jwtPayload.refreshToken, salt);
+    const jwtSign = jwtPayload.refreshToken.split('.')[2];
+    const hashedToken = await bcrypt.hash(jwtSign, salt);
 
     user.refreshToken = hashedToken;
     await user.save();
@@ -121,10 +122,11 @@ export class AuthService {
       lastName: lastName.toLowerCase(),
     });
 
-    const jwtPayload = this.signJWT(newUser);
+    const jwtPayload = await this.signJWT(newUser);
 
     const salt2 = await bcrypt.genSalt();
-    const hashedToken = await bcrypt.hash(jwtPayload.refreshToken, salt);
+    const jwtSign = jwtPayload.refreshToken.split('.')[2];
+    const hashedToken = await bcrypt.hash(jwtSign, salt2);
 
     newUser.refreshToken = hashedToken;
 
@@ -200,10 +202,11 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(password, user.password)))
       throw new UnauthorizedException('wrong credentials');
 
-    const jwtPayload = this.signJWT(user);
+    const jwtPayload = await this.signJWT(user);
 
     const salt = await bcrypt.genSalt();
-    const hashedToken = await bcrypt.hash(jwtPayload.refreshToken, salt);
+    const jwtSign = jwtPayload.refreshToken.split('.')[2];
+    const hashedToken = await bcrypt.hash(jwtSign, salt);
 
     user.refreshToken = hashedToken;
     await user.save();

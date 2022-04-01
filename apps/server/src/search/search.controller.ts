@@ -10,7 +10,7 @@ import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 export class SearchController {
   constructor(private searchService: SearchService) {}
 
-  @Get('/universities')
+  @Get('/university')
   @ApiParam({
     name: 'name',
     required: false,
@@ -21,7 +21,7 @@ export class SearchController {
     return this.searchService.getUniversities(name);
   }
 
-  @Get('/faculties')
+  @Get('/faculty')
   @UseGuards(JwtAccessGuard)
   @ApiBearerAuth()
   @ApiParam({
@@ -37,7 +37,7 @@ export class SearchController {
     return this.searchService.getFaculties(name, user);
   }
 
-  @Get('/intrests')
+  @Get('/intrest')
   @UseGuards(JwtAccessGuard)
   @ApiBearerAuth()
   @ApiParam({

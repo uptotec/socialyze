@@ -5,29 +5,22 @@ import {
   Get,
   Param,
   Post,
-  Res,
-  UploadedFile,
-  UploadedFiles,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { GetUser } from 'src/utils/decorators/getUser.decorator';
 import { EditProfileDto } from './dto/editProfile.dto';
 import { ProfileService } from './profile.service';
 import { User, UserDocument } from 'src/schema/user/user.schema';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { DeletePhotoDto } from '../photo/dto/deletePhoto.dto';
-import { Response } from 'express';
 import ProfileTypeGuard from 'src/auth/profileType.guard';
 import { ProfileTypes } from 'src/auth/profileTypes.enum';
-import { isMongoId } from 'class-validator';
 import { ObjectIdQueryDto } from './dto/objectId.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('profile')
 @UseGuards(
   ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
 )
+@ApiBearerAuth()
 @ApiTags('profile')
 export class ProfileController {
   constructor(private profileService: ProfileService) {}

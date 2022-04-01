@@ -28,13 +28,18 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
   async validate(request: Request, payload: JwtPayload) {
     const { _id } = payload;
-    const user = await this.UserModel.findOne({ id: _id });
+    const user = await this.UserModel.findOne({ id: _id }).select(
+      '-likes -dislikes -matches -blocks',
+    );
 
     const refreshToken = request.headers?.authorization.split(' ')[1];
 
-    if (!user) throw new UnauthorizedException();
+    if (!user || !user.refreshToken) throw new UnauthorizedException();
 
-    const valid = await bcrypt.compare(refreshToken, user.refreshToken);
+    const valid = await bcrypt.compare(
+      refreshToken.split('.')[2],
+      user.refreshToken,
+    );
 
     if (!valid) throw new UnauthorizedException();
 
