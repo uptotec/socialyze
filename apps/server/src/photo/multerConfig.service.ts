@@ -13,6 +13,29 @@ export class MulterConfigService implements MulterOptionsFactory {
   constructor(private photoService: PhotoService) {}
 
   createMulterOptions(): MulterModuleOptions {
+    this.photoService.s3.listBuckets((err, data) => {
+      let found: boolean;
+      if (err) {
+        console.log('Error', err);
+        return;
+      }
+
+      for (const bucket of data.Buckets) {
+        if (bucket.Name === this.photoService.bucket) found = true;
+      }
+
+      if (found) return;
+
+      this.photoService.s3.createBucket(
+        { Bucket: this.photoService.bucket },
+        (err) => {
+          if (err) {
+            console.log('Error', err);
+            return;
+          }
+        },
+      );
+    });
     return {
       storage: multerS3({
         s3: this.photoService.s3,
