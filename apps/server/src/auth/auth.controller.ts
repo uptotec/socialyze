@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Post,
-  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -26,6 +25,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiTags('Auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
   @Post('/signup/step1')
   async signUpStep1(@Body() credentials: SignUpStep1Dto): Promise<JwtResponse> {
     return this.authService.signUpStep1(credentials);

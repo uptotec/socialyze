@@ -12,13 +12,16 @@ export class JwtAccessStrategy extends PassportStrategy(
   Strategy,
   'jwt-access-token',
 ) {
+  public get configService(): ConfigService {
+    return this._configService;
+  }
   constructor(
     @InjectModel(User.name)
     private UserModel: Model<UserDocument>,
-    private configService: ConfigService,
+    private _configService: ConfigService,
   ) {
     super({
-      secretOrKey: configService.get('JWT_ACCESS_SECRET'),
+      secretOrKey: _configService.get('JWT_ACCESS_SECRET'),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
   }

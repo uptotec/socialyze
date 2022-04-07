@@ -14,13 +14,16 @@ export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
   'jwt-refresh-token',
 ) {
+  public get configService(): ConfigService {
+    return this._configService;
+  }
   constructor(
     @InjectModel(User.name)
     private UserModel: Model<UserDocument>,
-    private configService: ConfigService,
+    private _configService: ConfigService,
   ) {
     super({
-      secretOrKey: configService.get('JWT_REFRESH_SECRET'),
+      secretOrKey: _configService.get('JWT_REFRESH_SECRET'),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       passReqToCallback: true,
     });
@@ -28,18 +31,18 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
   async validate(request: Request, payload: JwtPayload) {
     const { _id } = payload;
+
     const user = await this.UserModel.findOne({ id: _id }).select(
       '-likes -dislikes -matches -blocks',
     );
 
-    const refreshToken = request.headers?.authorization.split(' ')[1];
-
     if (!user || !user.refreshToken) throw new UnauthorizedException();
 
-    const valid = await bcrypt.compare(
-      refreshToken.split('.')[2],
-      user.refreshToken,
-    );
+    const refreshToken = request.headers?.authorization
+      .split(' ')[1]
+      .split('.')[2];
+
+    const valid = await bcrypt.compare(refreshToken, user.refreshToken);
 
     if (!valid) throw new UnauthorizedException();
 

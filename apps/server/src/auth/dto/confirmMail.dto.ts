@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsPositive, Length } from 'class-validator';
+import { IsInt, IsNotEmpty, IsPositive } from 'class-validator';
 
 export class ConfirmMailDto {
   @IsNotEmpty()
