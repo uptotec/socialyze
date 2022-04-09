@@ -21,7 +21,7 @@ import { APP_GUARD } from '@nestjs/core';
       store: redisStore,
       isGlobal: true,
       ttl: 60 * 60,
-      url: 'http://redis:6379',
+      url: 'redis://redis:6379',
     }),
 
     ConfigModule.forRoot({
@@ -37,26 +37,30 @@ import { APP_GUARD } from '@nestjs/core';
       }),
     }),
 
-    MailerModule.forRoot({
-      transport: {
-        host: 'smtp.zoho.com',
-        secure: true,
-        port: 465,
-        auth: {
-          user: 'uptotec@zohomail.com',
-          pass: 't0M8QP5e2RqD',
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('SMTP_HOST'),
+          secure: true,
+          port: 465,
+          auth: {
+            user: configService.get<string>('SMTP_USER'),
+            pass: configService.get<string>('SMTP_PASS'),
+          },
         },
-      },
-      defaults: {
-        from: 'Mahmoud Ashraf <uptotec@zohomail.com>',
-      },
-      template: {
-        dir: __dirname + '/auth/emailTemplate',
-        adapter: new PugAdapter(),
-        options: {
-          strict: true,
+        defaults: {
+          from: configService.get<string>('SMTP_FROM'),
         },
-      },
+        template: {
+          dir: __dirname + '/auth/emailTemplate',
+          adapter: new PugAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
     }),
 
     ThrottlerModule.forRoot({
