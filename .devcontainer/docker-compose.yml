@@ -11,7 +11,7 @@ services:
       - redis
       - mongodb
     links:
-      - mobile
+      - app
     volumes:
       - ..:/workspace:cached
       - ./.zshrc:/home/node/.zshrc
@@ -19,10 +19,10 @@ services:
       - ./plugins:/home/node/.oh-my-zsh/custom/plugins
     command: /bin/sh -c "while sleep 1000; do :; done"
 
-  mobile:
-    container_name: mobile
+  app:
+    container_name: app
     build:
-      context: "../apps/mobile/.devcontainer/"
+      context: "../apps/app/.devcontainer/"
       dockerfile: Dockerfile
     depends_on:
       - redis
