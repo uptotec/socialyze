@@ -18,8 +18,8 @@ import ProfileTypeGuard from 'src/auth/profileType.guard';
 import { ProfileTypes } from 'src/auth/profileTypes.enum';
 import { UserDocument } from 'src/schema/user/user.schema';
 import { GetUser } from 'src/utils/decorators/getUser.decorator';
-import { DeletePhotoDto } from './dto/deletePhoto.dto';
-import { FilesUploadDto, FileUploadDto } from './dto/fileUpload.dto';
+import { DeletePhotoDto } from 'dto';
+import { FilesUploadDto, FileUploadDto } from 'dto';
 import { PhotoService } from './photo.service';
 
 @Controller('photo')

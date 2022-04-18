@@ -12,17 +12,17 @@ import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { JwtPayload, JwtResponse } from './dto/jwt.dto';
+import { AuthCredentialsDto } from 'dto';
+import { JwtPayload, JwtResponse } from 'dto';
 import { User, UserDocument } from '../schema/user/user.schema';
-import { SignUpStep1Dto, signUpStep2Dto } from './dto/signUp.dto';
+import { SignUpStep1Dto, signUpStep2Dto } from 'dto';
 import {
   University,
   UniversityDocument,
 } from 'src/schema/university/university.schema';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Cache } from 'cache-manager';
-import { ConfirmMailDto } from './dto/confirmMail.dto';
+import { ConfirmMailDto } from 'dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

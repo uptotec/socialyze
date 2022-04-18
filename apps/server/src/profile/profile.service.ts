@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EditProfileDto } from './dto/editProfile.dto';
+import { EditProfileDto } from 'dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserDocument, User } from 'src/schema/user/user.schema';

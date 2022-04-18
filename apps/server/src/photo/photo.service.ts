@@ -9,7 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as aws from 'aws-sdk';
 import { Response } from 'express';
 import { User, UserDocument } from 'src/schema/user/user.schema';
-import { DeletePhotoDto } from './dto/deletePhoto.dto';
+import { DeletePhotoDto } from 'dto';
 import { Model } from 'mongoose';
 
 @Injectable()

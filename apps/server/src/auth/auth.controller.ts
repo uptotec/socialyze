@@ -7,16 +7,16 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { AuthCredentialsDto } from 'dto';
 import { AuthService } from './auth.service';
-import { JwtResponse } from './dto/jwt.dto';
-import { SignUpStep1Dto, signUpStep2Dto } from './dto/signUp.dto';
+import { JwtResponse } from 'dto';
+import { SignUpStep1Dto, signUpStep2Dto } from 'dto';
 import { GetUser } from '../utils/decorators/getUser.decorator';
 import { UserDocument } from 'src/schema/user/user.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileTypes } from './profileTypes.enum';
 import ProfileTypeGuard from './profileType.guard';
-import { ConfirmMailDto } from './dto/confirmMail.dto';
+import { ConfirmMailDto } from 'dto';
 import { Throttle } from '@nestjs/throttler';
 import JwtRefreshGuard from './jwtRefresh.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';

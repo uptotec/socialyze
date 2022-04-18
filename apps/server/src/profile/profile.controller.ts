@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { GetUser } from 'src/utils/decorators/getUser.decorator';
-import { EditProfileDto } from './dto/editProfile.dto';
+import { EditProfileDto } from 'dto';
 import { ProfileService } from './profile.service';
 import { UserDocument } from 'src/schema/user/user.schema';
 import ProfileTypeGuard from 'src/auth/profileType.guard';
 import { ProfileTypes } from 'src/auth/profileTypes.enum';
-import { ObjectIdQueryDto } from './dto/objectId.dto';
+import { ObjectIdQueryDto } from 'dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('profile')
