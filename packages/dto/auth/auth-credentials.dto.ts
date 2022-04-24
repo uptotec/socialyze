@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsEmail,
@@ -8,8 +7,10 @@ import {
 } from 'class-validator';
 
 export class AuthCredentialsDto {
-  @IsEmail()
-  @ApiProperty()
+  constructor(values: AuthCredentialsDto) {
+    Object.assign(this, values);
+  }
+  @IsEmail(undefined, { message: 'email must be valid' })
   email: string;
 
   @IsNotEmpty()
@@ -18,6 +19,5 @@ export class AuthCredentialsDto {
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: 'Weak Passowrd',
   })
-  @ApiProperty()
   password: string;
 }
