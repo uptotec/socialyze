@@ -1,13 +1,14 @@
 import { AuthCredentialsDto, JwtResponse } from 'dto';
-import { ApiResponse, Axios } from './axios';
+import { Axios, AxiosRefresh } from './axios';
 
-export const loginApi = async (
-  credentials: AuthCredentialsDto,
-): Promise<ApiResponse<JwtResponse>> => {
+export const loginApi = async (credentials: AuthCredentialsDto) => {
+  return Axios.post<JwtResponse>('/auth/signin', credentials);
+};
+
+export const refreshToken = async () => {
   try {
-    const res = await Axios.post<JwtResponse>('/auth/signin', credentials);
-    return { isSuccessful: true, data: res.data, status: res.status };
+    return AxiosRefresh.get<JwtResponse>('/auth/refreash');
   } catch (err: any) {
-    return { isSuccessful: false, data: null, status: err.response.status };
+    return err;
   }
 };

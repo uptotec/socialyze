@@ -1,37 +1,32 @@
-import { Button, TextInput, StyleSheet } from 'react-native';
+import { Button, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import { useFormik } from 'formik';
 import { AuthCredentialsDto } from 'dto';
 import { createValidator } from 'class-validator-formik';
-import * as react from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { useMutation } from 'react-query';
 
 import { View, Text } from '../../components/basic/Themed';
 import { loginApi } from '../../api/auth';
 import { useAuthStore } from '../../store/auth.store';
 
 export default function SignInScreen() {
-  const [isLoginNotValid, setLoginNotValid] = react.useState(false);
-
   const setIsSignedIn = useAuthStore((state) => state.setIsSignedIn);
   const setTokens = useAuthStore((state) => state.setTokens);
 
-  const onSubmit = async (values: AuthCredentialsDto) => {
-    const res = await loginApi(values);
-    if (!res.isSuccessful) {
-      setLoginNotValid(true);
-      return;
-    }
-    const { accessToken, refreshToken, isEmailConfirmed, iscompleteProfile } =
-      res.data;
-    await SecureStore.setItemAsync('refreshToken', refreshToken);
-    setTokens(accessToken, refreshToken);
-    setIsSignedIn(true, isEmailConfirmed, iscompleteProfile);
-  };
+  const { isError, mutate, isLoading } = useMutation(loginApi, {
+    onSuccess: async (res) => {
+      const { accessToken, refreshToken, isEmailConfirmed, iscompleteProfile } =
+        res.data;
+      await SecureStore.setItemAsync('refreshToken', refreshToken);
+      setTokens(accessToken, refreshToken);
+      setIsSignedIn(true, isEmailConfirmed, iscompleteProfile);
+    },
+  });
 
   const { handleChange, handleBlur, handleSubmit, values, errors, touched } =
     useFormik({
       initialValues: { email: '', password: '' },
-      onSubmit: onSubmit,
+      onSubmit: (values) => mutate(values),
       validate: createValidator(AuthCredentialsDto),
     });
 
@@ -58,8 +53,13 @@ export default function SignInScreen() {
           secureTextEntry={true}
         />
         {touched.password && errors.password && <Text>{errors.password}</Text>}
-        <Button onPress={() => handleSubmit()} title="Login" />
-        {isLoginNotValid && <Text>Login not valid</Text>}
+        <Button
+          onPress={() => handleSubmit()}
+          title="login"
+          disabled={isLoading}
+        />
+        {isLoading && <ActivityIndicator size="small" animating={isLoading} />}
+        {isError && <Text>Login not valid</Text>}
       </View>
     </View>
   );
