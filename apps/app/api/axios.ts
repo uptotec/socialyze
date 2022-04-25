@@ -1,5 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { JwtResponse } from 'dto';
+import { useAuthStore } from '../store/auth.store';
 
 export type ApiResponse<T> =
   | {
@@ -13,19 +15,60 @@ export type ApiResponse<T> =
       data: T;
     };
 
+export const baseUrl = 'http://192.168.1.11:3000';
+
+export const refreshAccessToken = async () => {
+  const token = await SecureStore.getItemAsync('refreshToken');
+
+  if (!token) return;
+
+  try {
+    const res = await axios.get<JwtResponse>(baseUrl + '/auth/refreash', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const {
+      isEmailConfirmed,
+      iscompleteProfile,
+      refreshToken,
+      expAccessToken,
+      accessToken,
+    } = res.data;
+
+    await SecureStore.setItemAsync('refreshToken', refreshToken);
+    useAuthStore.setState({
+      accessToken,
+      expAccessToken,
+      refreshToken,
+      isSignedIn: true,
+      isEmailConfirmed,
+      isCompleteProfile: iscompleteProfile,
+    });
+  } catch (err: any) {
+    return;
+  }
+};
+
 export const Axios = axios.create({
-  baseURL: 'http://192.168.1.11:3000',
+  baseURL: baseUrl,
   timeout: 1000,
 });
 
-const rToken = async () => await SecureStore.getItemAsync('refreshToken');
+Axios.interceptors.request.use(async function (config) {
+  const authState = useAuthStore.getState();
 
-export const AxiosRefresh = axios.create({
-  baseURL: 'http://192.168.1.11:3000',
-  timeout: 1000,
-});
+  console.log('check ', Date.now(), authState.expAccessToken! * 1000);
+  if (
+    authState.expAccessToken &&
+    authState.accessToken &&
+    Date.now() >= authState.expAccessToken! * 1000
+  ) {
+    config.headers = { Authorization: `Bearer ${authState.accessToken}` };
+    return config;
+  }
 
-AxiosRefresh.interceptors.request.use(async function (config) {
-  config.headers = { Authorization: `Bearer ${await rToken()}` };
+  await refreshAccessToken();
+  const newAccessToken = useAuthStore.getState().accessToken;
+  config.headers = { Authorization: `Bearer ${newAccessToken}` };
   return config;
 });

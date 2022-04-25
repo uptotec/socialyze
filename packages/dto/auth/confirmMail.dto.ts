@@ -1,8 +1,7 @@
-import { IsInt, IsNotEmpty, IsPositive } from 'class-validator';
+import { IsNotEmpty, Matches } from 'class-validator';
 
 export class ConfirmMailDto {
   @IsNotEmpty()
-  @IsInt()
-  @IsPositive()
+  @Matches(/^\d+$/, { message: 'code must be only numbers' })
   code: string;
 }

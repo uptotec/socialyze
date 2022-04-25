@@ -32,7 +32,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
   async validate(request: Request, payload: JwtPayload) {
     const { _id } = payload;
 
-    const user = await this.UserModel.findOne({ id: _id }).select(
+    const user = await this.UserModel.findOne({ _id: _id }).select(
       '-likes -dislikes -matches -blocks',
     );
 

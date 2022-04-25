@@ -1,6 +1,8 @@
 export class JwtPayload {
   _id: string;
   email: string;
+  iat?: number;
+  exp?: number;
 }
 
 export class JwtResponse {
@@ -8,4 +10,6 @@ export class JwtResponse {
   refreshToken: string;
   iscompleteProfile: boolean;
   isEmailConfirmed: boolean;
+  expAccessToken: number;
+  expRefreshToken: number;
 }

@@ -44,6 +44,8 @@ export class AuthService {
       email: user.email,
     };
 
+    console.log('refreshed');
+
     const accessToken: string = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_ACCESS_SECRET'),
       expiresIn: '30m',
@@ -54,11 +56,16 @@ export class AuthService {
       expiresIn: '90 days',
     });
 
+    const rToken = this.jwtService.decode(refreshToken) as JwtPayload;
+    const aToken = this.jwtService.decode(accessToken) as JwtPayload;
+
     return {
       isEmailConfirmed: user.isEmailConfirmed,
       iscompleteProfile: user.completeProfile,
       accessToken,
       refreshToken,
+      expAccessToken: aToken.exp,
+      expRefreshToken: rToken.exp,
     };
   }
 
@@ -118,8 +125,8 @@ export class AuthService {
       email,
       password: hashedPassword,
       university,
-      firstName: firstName.toLowerCase(),
-      lastName: lastName.toLowerCase(),
+      firstName: firstName.toLowerCase().replace(/\s/g, ''),
+      lastName: lastName.toLowerCase().replace(/\s/g, ''),
     });
 
     const jwtPayload = await this.signJWT(newUser);
@@ -154,7 +161,7 @@ export class AuthService {
     user: UserDocument,
   ): Promise<void> {
     const storedCode = await this.cacheManager.get(`CONFIRM-${user._id}`);
-    if (!storedCode || storedCode !== code)
+    if (!storedCode || storedCode.toString() !== code)
       throw new UnauthorizedException('invalid Code');
 
     user.isEmailConfirmed = true;

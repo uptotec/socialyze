@@ -14,11 +14,17 @@ export default function SignInScreen() {
   const setTokens = useAuthStore((state) => state.setTokens);
 
   const { isError, mutate, isLoading } = useMutation(loginApi, {
+    onError: (err) => console.log(err),
     onSuccess: async (res) => {
-      const { accessToken, refreshToken, isEmailConfirmed, iscompleteProfile } =
-        res.data;
+      const {
+        accessToken,
+        refreshToken,
+        isEmailConfirmed,
+        iscompleteProfile,
+        expAccessToken,
+      } = res.data;
       await SecureStore.setItemAsync('refreshToken', refreshToken);
-      setTokens(accessToken, refreshToken);
+      setTokens(accessToken, expAccessToken, refreshToken);
       setIsSignedIn(true, isEmailConfirmed, iscompleteProfile);
     },
   });

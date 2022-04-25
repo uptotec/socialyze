@@ -29,7 +29,7 @@ export class JwtAccessStrategy extends PassportStrategy(
   async validate(payload: JwtPayload) {
     const { _id } = payload;
     const user = await this.UserModel.findOneAndUpdate(
-      { _id },
+      { _id: _id },
       { lastActive: new Date() },
     );
 

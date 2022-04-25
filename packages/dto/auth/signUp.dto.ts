@@ -25,12 +25,12 @@ export class signUpStep2Dto {
 }
 
 export class SignUpStep1Dto {
-  @IsNotEmpty()
-  @Length(2, 26)
+  @IsNotEmpty({ message: 'first name can not be empty' })
+  @Length(2, 26, { message: 'first name is too long or too short' })
   firstName: string;
 
-  @IsNotEmpty()
-  @Length(2, 26)
+  @IsNotEmpty({ message: 'last name can not be empty' })
+  @Length(2, 26, { message: 'last name is too long or too short' })
   lastName: string;
 
   @IsNotEmpty()

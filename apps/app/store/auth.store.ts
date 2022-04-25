@@ -6,9 +6,14 @@ type authStore = {
   isEmailConfirmed: boolean;
   isCompleteProfile: boolean;
   accessToken: string | null;
+  expAccessToken: number | null;
   refreshToken: string | null;
   user: UserResponseDto | null;
-  setTokens: (accessToken: string, refreshToken: string) => void;
+  setTokens: (
+    accessToken: string,
+    expAccessToken: number,
+    refreshToken: string,
+  ) => void;
   setUser: (user: UserResponseDto) => void;
   setIsSignedIn: (
     isSignedIn: boolean,
@@ -22,10 +27,11 @@ export const useAuthStore = create<authStore>((set) => ({
   isEmailConfirmed: false,
   isCompleteProfile: false,
   accessToken: null,
+  expAccessToken: null,
   refreshToken: null,
   user: null,
-  setTokens(accessToken, refreshToken) {
-    set({ accessToken, refreshToken });
+  setTokens(accessToken, expAccessToken, refreshToken) {
+    set({ accessToken, expAccessToken, refreshToken });
   },
   setUser(user) {
     set({ user });
