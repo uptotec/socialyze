@@ -19,10 +19,8 @@ import ProfileTypeGuard from './profileType.guard';
 import { ConfirmMailDto } from 'dto';
 // import { Throttle } from '@nestjs/throttler';
 import JwtRefreshGuard from './jwtRefresh.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
-@ApiTags('Auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -35,7 +33,6 @@ export class AuthController {
   @UseGuards(
     ProfileTypeGuard([ProfileTypes.Uncomplete, ProfileTypes.EmailNotConfirmed]),
   )
-  @ApiBearerAuth()
   async confirmMail(
     @Body() code: ConfirmMailDto,
     @GetUser() user: UserDocument,
@@ -47,7 +44,6 @@ export class AuthController {
   @UseGuards(
     ProfileTypeGuard([ProfileTypes.Uncomplete, ProfileTypes.EmailNotConfirmed]),
   )
-  @ApiBearerAuth()
   // @Throttle(1, 60)
   async resendConfirmMail(@GetUser() user: UserDocument) {
     return this.authService.resendConfirmMail(user);
@@ -57,7 +53,6 @@ export class AuthController {
   @UseGuards(
     ProfileTypeGuard([ProfileTypes.Uncomplete, ProfileTypes.EmailConfirmed]),
   )
-  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('photo'))
   async signUpStep2(
     @Body() profileInfo: signUpStep2Dto,
@@ -74,7 +69,6 @@ export class AuthController {
 
   @Get('/refreash')
   @UseGuards(JwtRefreshGuard)
-  @ApiBearerAuth()
   async refreshJwt(@GetUser() user: UserDocument) {
     return this.authService.RefreshAccessToken(user);
   }

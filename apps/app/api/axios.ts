@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import { JwtResponse } from 'dto';
+import { JwtResponse, UserResponseDto } from 'dto';
 import { useAuthStore } from '../store/auth.store';
 
 export type ApiResponse<T> =
@@ -35,8 +35,16 @@ export const refreshAccessToken = async () => {
       accessToken,
     } = res.data;
 
+    const { data: user } = await axios.get<UserResponseDto>(
+      baseUrl + '/profile/my',
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+
     await SecureStore.setItemAsync('refreshToken', refreshToken);
     useAuthStore.setState({
+      user,
       accessToken,
       expAccessToken,
       refreshToken,
@@ -51,7 +59,6 @@ export const refreshAccessToken = async () => {
 
 export const Axios = axios.create({
   baseURL: baseUrl,
-  timeout: 1000,
 });
 
 Axios.interceptors.request.use(async function (config) {
@@ -63,12 +70,20 @@ Axios.interceptors.request.use(async function (config) {
     authState.accessToken &&
     Date.now() >= authState.expAccessToken! * 1000
   ) {
-    config.headers = { Authorization: `Bearer ${authState.accessToken}` };
+    if (config.headers) {
+      config.headers['Authorization'] = `Bearer ${authState.accessToken}`;
+    } else {
+      config.headers = { Authorization: `Bearer ${authState.accessToken}` };
+    }
     return config;
   }
 
   await refreshAccessToken();
   const newAccessToken = useAuthStore.getState().accessToken;
-  config.headers = { Authorization: `Bearer ${newAccessToken}` };
+  if (config.headers) {
+    config.headers['Authorization'] = `Bearer ${newAccessToken}`;
+  } else {
+    config.headers = { Authorization: `Bearer ${newAccessToken}` };
+  }
   return config;
 });

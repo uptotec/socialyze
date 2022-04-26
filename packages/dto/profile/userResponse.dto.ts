@@ -1,13 +1,16 @@
+import { FacultyResponseDto, IntrestResponseDto } from 'search';
+import { UniversityResponseDto } from 'search/university.dto';
+
 export class UserResponseDto {
   _id: string;
   firstName: string;
   lastName: string;
-  name: string;
+  fullName: string;
   bio: string;
   profilePhoto: Record<string, any>;
   photos: Record<string, any>[];
   age: number;
-  university: string;
-  faculty: string;
-  interests: string[];
+  university: UniversityResponseDto;
+  faculty: FacultyResponseDto;
+  interests: IntrestResponseDto[];
 }

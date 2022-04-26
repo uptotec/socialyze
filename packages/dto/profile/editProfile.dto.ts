@@ -15,7 +15,7 @@ export class EditProfileDto {
 
   @IsOptional()
   @IsDateString()
-  birthDay?: Date;
+  birthDay?: string;
 
   @IsOptional()
   faculty?: string;

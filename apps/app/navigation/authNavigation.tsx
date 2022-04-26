@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ConfirmMailScreen from '../screens/auth/confirmEmail';
 
 import SignInScreen from '../screens/auth/signIn';
 import { useAuthStore } from '../store/auth.store';
@@ -7,6 +6,8 @@ import BottomTabNavigator from './tabNavigation';
 import SignUpStep2Screen from '../screens/auth/signupStep2';
 import SignUpStep1Screen from '../screens/auth/signupStep1';
 import { AuthStackParamList } from '../types';
+import ConfirmMailScreen from '../screens/auth/confirmEmail';
+import SelectIntrestsScreen from '../screens/auth/intrests';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -34,7 +35,7 @@ export default function AuthNavigator() {
         <Stack.Screen
           name="ConfirmMail"
           component={ConfirmMailScreen}
-          options={{ title: 'SignIn' }}
+          options={{ title: 'Confirm Your Email' }}
         />
       </Stack.Navigator>
     );
@@ -46,7 +47,12 @@ export default function AuthNavigator() {
         <Stack.Screen
           name="Signup2"
           component={SignUpStep2Screen}
-          options={{ title: 'SignIn' }}
+          options={{ title: 'Complete Your Profile' }}
+        />
+        <Stack.Screen
+          name="Intrests"
+          component={SelectIntrestsScreen}
+          options={{ title: 'Select Your Intrests' }}
         />
       </Stack.Navigator>
     );

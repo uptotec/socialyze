@@ -9,6 +9,7 @@ import {
   NavigatorScreenParams,
 } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { signUpStep2DtoScreen1 } from 'dto';
 
 declare global {
   namespace ReactNavigation {
@@ -22,6 +23,7 @@ export type AuthStackParamList = {
   ConfirmMail: undefined;
   Signup1: undefined;
   Signup2: undefined;
+  Intrests: signUpStep2DtoScreen1;
 };
 
 export type AuthStackScreenProps<Screen extends keyof AuthStackParamList> =

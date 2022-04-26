@@ -6,18 +6,6 @@
       "**/*.pug"
     ],
     "watchAssets": true,
-    "plugins": [
-      {
-        "name": "@nestjs/swagger/plugin",
-        "options": {
-          "classValidatorShim": true,
-          "introspectComments": false,
-          "dtoFileNameSuffix": [
-            ".dto.ts",
-            ".schema.ts"
-          ]
-        }
-      }
-    ]
+    "plugins": []
   }
 }

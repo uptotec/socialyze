@@ -15,13 +15,32 @@ export class signUpStep2Dto {
 
   @IsNotEmpty()
   @IsDateString()
-  birthDay: Date;
+  birthDay: string;
 
   @IsNotEmpty()
   faculty: string;
 
   @IsNotEmpty()
   interests: string[];
+
+  @IsNotEmpty()
+  photo: any;
+}
+
+export class signUpStep2DtoScreen1 {
+  @IsNotEmpty()
+  @Length(100, 280)
+  bio: string;
+
+  @IsNotEmpty()
+  @IsDateString()
+  birthDay: string;
+
+  @IsNotEmpty()
+  faculty: string;
+
+  @IsNotEmpty()
+  photo: any;
 }
 
 export class SignUpStep1Dto {

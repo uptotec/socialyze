@@ -6,27 +6,22 @@ import { UserDocument } from 'src/schema/user/user.schema';
 import ProfileTypeGuard from 'src/auth/profileType.guard';
 import { ProfileTypes } from 'src/auth/profileTypes.enum';
 import { ObjectIdQueryDto } from 'dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import JwtAccessGuard from 'src/auth/jwtAccess.guard';
 
 @Controller('profile')
-@UseGuards(
-  ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
-)
-@ApiBearerAuth()
-@ApiTags('profile')
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
 
   @Get('/my')
+  @UseGuards(JwtAccessGuard)
   async getMyProfile(@GetUser() user: UserDocument) {
-    return {
-      profile: user,
-      isEmailConfirmed: user.isEmailConfirmed,
-      completeProfile: user.completeProfile,
-    };
+    return user;
   }
 
   @Get('/:id')
+  @UseGuards(
+    ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
+  )
   async getProfileById(
     @Param() { id }: ObjectIdQueryDto,
     @GetUser() user: UserDocument,
@@ -35,6 +30,9 @@ export class ProfileController {
   }
 
   @Post()
+  @UseGuards(
+    ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
+  )
   async editMyProfile(
     @Body() editProfileDto: EditProfileDto,
     @GetUser() user: UserDocument,

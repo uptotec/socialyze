@@ -11,21 +11,16 @@ import { AuthStackParamList } from '../../types';
 import { useAuthStore } from '../../store/auth.store';
 import { signupStep1Api } from '../../api';
 import React from 'react';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Signup1'>;
 
 export default function SignUpStep1Screen({ navigation }: Props) {
   const setIsSignedIn = useAuthStore((state) => state.setIsSignedIn);
   const setTokens = useAuthStore((state) => state.setTokens);
-  const [errorMessage, setErrorMessage] = React.useState('');
 
   const { isError, mutate, isLoading, error } = useMutation(signupStep1Api, {
-    onError: (err: AxiosError) => {
-      if (axios.isAxiosError(err)) {
-        setErrorMessage(err.response?.data.message);
-      }
-    },
+    onError: (err: AxiosError) => console.log(err),
     onSuccess: async (res) => {
       const {
         accessToken,

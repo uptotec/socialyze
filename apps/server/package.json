@@ -29,7 +29,6 @@
     "@nestjs/mongoose": "^9.0.2",
     "@nestjs/passport": "^8.2.1",
     "@nestjs/platform-express": "^8.0.0",
-    "@nestjs/swagger": "^5.2.0",
     "@nestjs/throttler": "^2.0.1",
     "aws-sdk": "^2.1087.0",
     "bcrypt": "^5.0.1",
@@ -37,6 +36,7 @@
     "cache-manager-redis-store": "^2.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "dto": "*",
     "mongoose": "^6.2.4",
     "multer-s3": "^2.10.0",
     "nestjs-mongoose-exclude": "^1.0.5",
@@ -49,8 +49,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "swagger-ui-express": "^4.3.0",
-    "uuid": "^8.3.2",
-    "dto": "*"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
