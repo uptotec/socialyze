@@ -83,7 +83,7 @@ export default function SignUpStep2Screen({ navigation }: Props) {
       {values.photo && (
         <Image
           source={{ uri: values.photo.uri }}
-          style={{ width: 50, height: 50 }}
+          style={{ width: 150, height: 150 }}
         />
       )}
       <Button title="Pick Profile Photo" onPress={pickImage} />

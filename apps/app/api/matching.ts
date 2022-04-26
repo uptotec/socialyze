@@ -8,3 +8,7 @@ export const getRecommendationsApi = async () => {
 export const likeOrDislikeApi = async (data: LikeOrDislikeDto) => {
   return Axios.post<void>('/matching/likeOrDislike', data);
 };
+
+export const getMatchesApi = async () => {
+  return Axios.get<UserResponseDto[]>('/matching/getMatches');
+};

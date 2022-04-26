@@ -59,6 +59,7 @@ export const refreshAccessToken = async () => {
 
 export const Axios = axios.create({
   baseURL: baseUrl,
+  timeout: 2000,
 });
 
 Axios.interceptors.request.use(async function (config) {

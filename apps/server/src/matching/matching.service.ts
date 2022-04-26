@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/schema/user/user.schema';
-import { Model } from 'mongoose';
+import mongoose from 'mongoose';
 import { LikeOrDislikeDto } from 'dto';
 
 @Injectable()
 export class MatchingService {
   constructor(
     @InjectModel(User.name)
-    private UserModel: Model<UserDocument>,
+    private UserModel: mongoose.Model<UserDocument>,
   ) {}
 
   async getRecommendations(user: UserDocument) {
-    return await this.UserModel.find({
+    const x = await this.UserModel.find({
       _id: {
         $nin: [user._id, ...user.likes, ...user.dislikes, ...user.blocks],
       },
@@ -22,6 +22,7 @@ export class MatchingService {
       blocks: { $ne: user._id },
       matches: { $ne: user._id },
     }).limit(15);
+    return x;
   }
 
   async likeOrDislike(user: UserDocument, { userId, type }: LikeOrDislikeDto) {
@@ -37,14 +38,14 @@ export class MatchingService {
     });
 
     if (!likedBack) {
-      user.likes.push(userId as any);
+      user.likes.push(new mongoose.mongo.ObjectId(userId) as any);
       await user.save();
       return;
     }
 
-    user.matches.push(userId as any);
+    user.matches.push(new mongoose.mongo.ObjectId(userId) as any);
     likedBack.matches.push(user._id);
-    likedBack.likes = likedBack.likes.filter((u) => u._id !== user._id);
+    likedBack.likes = likedBack.likes.filter((u) => u._id != user._id);
 
     await user.save();
     await likedBack.save();
@@ -52,6 +53,6 @@ export class MatchingService {
   }
 
   async getMatches(user: UserDocument) {
-    return user.matches;
+    return (await user.populate('matches')).matches;
   }
 }

@@ -128,21 +128,21 @@ userSchema.virtual('age').get(function (this: UserDocument) {
 
 userSchema.pre('find', function (next) {
   const user = this;
-  user.populate('interests university faculty matches');
+  user.populate('interests university faculty');
   // .populate('university', '-emailDomain -faculties');
   next();
 });
 
 userSchema.pre('findOne', function (next) {
   const user = this;
-  user.populate('interests university faculty matches');
+  user.populate('interests university faculty');
   // .populate('university', '-emailDomain -faculties');
   next();
 });
 
 userSchema.pre('findOneAndUpdate', function (next) {
   const user = this;
-  user.populate('interests university faculty matches');
+  user.populate('interests university faculty');
   // .populate('university', '-emailDomain -faculties');
   next();
 });
