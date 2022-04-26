@@ -2,7 +2,7 @@ import { FacultyResponseDto, IntrestResponseDto } from 'search';
 import { UniversityResponseDto } from 'search/university.dto';
 
 export class UserResponseDto {
-  _id: string;
+  id: string;
   firstName: string;
   lastName: string;
   fullName: string;

@@ -57,7 +57,7 @@ export class PhotoService {
 
     user.profilePhoto = {
       name: file.key,
-      url: `/profile/photo/${file.key}`,
+      url: `/photo/${file.key}`,
     };
     await user.save();
   }
@@ -74,7 +74,7 @@ export class PhotoService {
     }
 
     for (const file of files) {
-      user.photos.push({ name: file.key, url: `/profile/photo/${file.key}` });
+      user.photos.push({ name: file.key, url: `/photo/${file.key}` });
     }
 
     await user.save();
@@ -104,13 +104,13 @@ export class PhotoService {
     await user.save();
   }
 
-  async getPhoto(id: string, user: UserDocument, res: Response) {
-    const photoOwner = await this.UserModel.exists({
-      $or: [{ 'profilePhoto.name': id }, { 'photos.name': id }],
-      blocks: { $ne: user._id },
-    });
+  async getPhoto(id: string, res: Response) {
+    // const photoOwner = await this.UserModel.exists({
+    //   $or: [{ 'profilePhoto.name': id }, { 'photos.name': id }],
+    //   blocks: { $ne: user._id },
+    // });
 
-    if (!photoOwner) throw new NotFoundException();
+    // if (!photoOwner) throw new NotFoundException();
 
     const url = await this.getPhotoUrl(id);
 

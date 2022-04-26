@@ -23,7 +23,6 @@ export class signUpStep2Dto {
   @IsNotEmpty()
   interests: string[];
 
-  @IsNotEmpty()
   photo: any;
 }
 

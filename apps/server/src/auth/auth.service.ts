@@ -195,7 +195,7 @@ export class AuthService {
     user.interests = profileInfo.interests;
     user.profilePhoto = {
       name: profilePic.key,
-      url: `/profile/photo/${profilePic.key}`,
+      url: `/photo/${profilePic.key}`,
     };
 
     await user.save();

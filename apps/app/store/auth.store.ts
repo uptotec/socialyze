@@ -1,26 +1,47 @@
 import create from 'zustand';
 import { UserResponseDto } from 'dto';
 
-type authStore = {
-  isSignedIn: boolean;
-  isEmailConfirmed: boolean;
-  isCompleteProfile: boolean;
-  accessToken: string | null;
-  expAccessToken: number | null;
-  refreshToken: string | null;
-  user: UserResponseDto | null;
-  setTokens: (
-    accessToken: string,
-    expAccessToken: number,
-    refreshToken: string,
-  ) => void;
-  setUser: (user: UserResponseDto) => void;
-  setIsSignedIn: (
-    isSignedIn: boolean,
-    isEmailConfirmed: boolean,
-    isCompleteProfile: boolean,
-  ) => void;
-};
+type authStore =
+  | {
+      isSignedIn: false;
+      isEmailConfirmed: boolean;
+      isCompleteProfile: boolean;
+      accessToken: null;
+      expAccessToken: null;
+      refreshToken: null;
+      user: null;
+      setTokens: (
+        accessToken: string,
+        expAccessToken: number,
+        refreshToken: string,
+      ) => void;
+      setUser: (user: UserResponseDto) => void;
+      setIsSignedIn: (
+        isSignedIn: boolean,
+        isEmailConfirmed: boolean,
+        isCompleteProfile: boolean,
+      ) => void;
+    }
+  | {
+      isSignedIn: true;
+      isEmailConfirmed: boolean;
+      isCompleteProfile: boolean;
+      accessToken: string;
+      expAccessToken: number;
+      refreshToken: string;
+      user: UserResponseDto;
+      setTokens: (
+        accessToken: string,
+        expAccessToken: number,
+        refreshToken: string,
+      ) => void;
+      setUser: (user: UserResponseDto) => void;
+      setIsSignedIn: (
+        isSignedIn: boolean,
+        isEmailConfirmed: boolean,
+        isCompleteProfile: boolean,
+      ) => void;
+    };
 
 export const useAuthStore = create<authStore>((set) => ({
   isSignedIn: false,

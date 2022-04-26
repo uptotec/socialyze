@@ -21,13 +21,13 @@ import { DeletePhotoDto } from 'dto';
 import { PhotoService } from './photo.service';
 
 @Controller('photo')
-@UseGuards(
-  ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
-)
 export class PhotoController {
   constructor(private photoService: PhotoService) {}
 
   @Post('uploadProfilePhoto')
+  @UseGuards(
+    ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
+  )
   @UseInterceptors(FileInterceptor('photo'))
   async uploadProfilePhoto(
     @UploadedFile() file: Express.MulterS3.File,
@@ -37,6 +37,9 @@ export class PhotoController {
   }
 
   @Post('uploadPhotos')
+  @UseGuards(
+    ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
+  )
   @UseInterceptors(FilesInterceptor('photos', 5))
   async uploadPhotos(
     @UploadedFiles() files: Array<Express.MulterS3.File>,
@@ -46,6 +49,9 @@ export class PhotoController {
   }
 
   @Delete('/deletePhotos')
+  @UseGuards(
+    ProfileTypeGuard([ProfileTypes.Complete, ProfileTypes.EmailConfirmed]),
+  )
   async deletePhotos(
     @Body() photos: DeletePhotoDto,
     @GetUser() user: UserDocument,
@@ -54,11 +60,7 @@ export class PhotoController {
   }
 
   @Get('/:name')
-  async getPhoto(
-    @Param('name') name: string,
-    @GetUser() user: UserDocument,
-    @Res() res: Response,
-  ) {
-    return await this.photoService.getPhoto(name, user, res);
+  async getPhoto(@Param('name') name: string, @Res() res: Response) {
+    return await this.photoService.getPhoto(name, res);
   }
 }

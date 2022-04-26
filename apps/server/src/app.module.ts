@@ -12,6 +12,7 @@ import { PhotoModule } from './photo/photo.module';
 import { SearchModule } from './search/search.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { MatchingModule } from './matching/matching.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { APP_GUARD } from '@nestjs/core';
     ProfileModule,
     PhotoModule,
     SearchModule,
+    MatchingModule,
   ],
 
   providers: [
