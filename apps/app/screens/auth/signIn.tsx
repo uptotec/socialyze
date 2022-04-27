@@ -1,11 +1,17 @@
-import { Button, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { StyleSheet, ActivityIndicator } from 'react-native';
 import { useFormik } from 'formik';
 import { AuthCredentialsDto } from 'dto';
 import { createValidator } from 'class-validator-formik';
 import * as SecureStore from 'expo-secure-store';
 import { useMutation } from 'react-query';
 
-import { View, Text } from '../../components/basic/Themed';
+import {
+  View,
+  Text,
+  HideKeyboard,
+  Button,
+  TextInput,
+} from '../../components/basic/Themed';
 import { loginApi } from '../../api/auth';
 import { useAuthStore } from '../../store/auth.store';
 
@@ -37,37 +43,43 @@ export default function SignInScreen() {
     });
 
   return (
-    <View style={styles.container}>
-      <Text>SignIn Screen</Text>
-      <View>
-        <TextInput
-          onChangeText={handleChange('email')}
-          onBlur={handleBlur('email')}
-          value={values.email}
-          style={styles.input}
-          placeholder="email"
-          keyboardType="email-address"
-        />
-        {touched.email && errors.email && <Text>{errors.email}</Text>}
-        <View style={styles.separator} />
-        <TextInput
-          onChangeText={handleChange('password')}
-          onBlur={handleBlur('password')}
-          value={values.password}
-          style={styles.input}
-          placeholder="password"
-          secureTextEntry={true}
-        />
-        {touched.password && errors.password && <Text>{errors.password}</Text>}
-        <Button
-          onPress={() => handleSubmit()}
-          title="login"
-          disabled={isLoading}
-        />
-        {isLoading && <ActivityIndicator size="small" animating={isLoading} />}
-        {isError && <Text>Login not valid</Text>}
+    <HideKeyboard>
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome Back!</Text>
+        <View>
+          <TextInput
+            title="email"
+            onChangeText={handleChange('email')}
+            onBlur={handleBlur('email')}
+            value={values.email}
+            placeholder="email"
+            keyboardType="email-address"
+          />
+          {touched.email && errors.email && <Text>{errors.email}</Text>}
+          <View style={styles.separator} />
+          <TextInput
+            title="password"
+            onChangeText={handleChange('password')}
+            onBlur={handleBlur('password')}
+            value={values.password}
+            placeholder="password"
+            secureTextEntry={true}
+          />
+          {touched.password && errors.password && (
+            <Text>{errors.password}</Text>
+          )}
+          <Button
+            onPress={() => handleSubmit()}
+            title="login"
+            disabled={isLoading}
+          />
+          {isLoading && (
+            <ActivityIndicator size="small" animating={isLoading} />
+          )}
+          {isError && <Text>Login not valid</Text>}
+        </View>
       </View>
-    </View>
+    </HideKeyboard>
   );
 }
 
@@ -78,7 +90,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   separator: {

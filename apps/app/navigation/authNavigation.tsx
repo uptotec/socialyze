@@ -8,6 +8,7 @@ import SignUpStep1Screen from '../screens/auth/signupStep1';
 import { AuthStackParamList } from '../types';
 import ConfirmMailScreen from '../screens/auth/confirmEmail';
 import SelectIntrestsScreen from '../screens/auth/intrests';
+import { Image } from 'react-native';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -19,7 +20,16 @@ export default function AuthNavigator() {
 
   if (isSignedIn && isEmailConfirmed && isCompleteProfile) {
     return (
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerTitle: () => (
+            <Image
+              source={require('../assets/images/logo.png')}
+              style={{ width: 160, height: 35 }}
+            />
+          ),
+        }}
+      >
         <Stack.Screen
           name="Root"
           component={BottomTabNavigator}
@@ -31,7 +41,16 @@ export default function AuthNavigator() {
 
   if (isSignedIn && !isEmailConfirmed) {
     return (
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerTitle: () => (
+            <Image
+              source={require('../assets/images/logo.png')}
+              style={{ width: 160, height: 35 }}
+            />
+          ),
+        }}
+      >
         <Stack.Screen
           name="ConfirmMail"
           component={ConfirmMailScreen}
@@ -43,7 +62,16 @@ export default function AuthNavigator() {
 
   if (isSignedIn && isEmailConfirmed && !isCompleteProfile) {
     return (
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerTitle: () => (
+            <Image
+              source={require('../assets/images/logo.png')}
+              style={{ width: 160, height: 35 }}
+            />
+          ),
+        }}
+      >
         <Stack.Screen
           name="Signup2"
           component={SignUpStep2Screen}
@@ -59,7 +87,16 @@ export default function AuthNavigator() {
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerTitle: () => (
+          <Image
+            source={require('../assets/images/logo.png')}
+            style={{ width: 160, height: 35 }}
+          />
+        ),
+      }}
+    >
       <Stack.Screen
         name="Signup1"
         component={SignUpStep1Screen}

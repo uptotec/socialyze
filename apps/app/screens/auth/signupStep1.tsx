@@ -1,12 +1,18 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Button, StyleSheet, ActivityIndicator, TextInput } from 'react-native';
+import { StyleSheet, ActivityIndicator } from 'react-native';
 import { useFormik } from 'formik';
 import { createValidator } from 'class-validator-formik';
 import { SignUpStep1Dto } from 'dto';
 import { useMutation } from 'react-query';
 import * as SecureStore from 'expo-secure-store';
 
-import { Text, View } from '../../components/basic/Themed';
+import {
+  Text,
+  View,
+  Button,
+  TextInput,
+  HideKeyboard,
+} from '../../components/basic/Themed';
 import { AuthStackParamList } from '../../types';
 import { useAuthStore } from '../../store/auth.store';
 import { signupStep1Api } from '../../api';
@@ -42,61 +48,72 @@ export default function SignUpStep1Screen({ navigation }: Props) {
       validate: createValidator(SignUpStep1Dto),
     });
   return (
-    <View style={styles.container}>
-      <Text>SignUp Screen</Text>
-      <View>
-        <TextInput
-          onChangeText={handleChange('firstName')}
-          onBlur={handleBlur('firstName')}
-          value={values.firstName}
-          style={styles.input}
-          placeholder="First Name"
-        />
-        {touched.firstName && errors.firstName && (
-          <Text>{errors.firstName}</Text>
-        )}
-        <TextInput
-          onChangeText={handleChange('lastName')}
-          onBlur={handleBlur('lastName')}
-          value={values.lastName}
-          style={styles.input}
-          placeholder="Last Name"
-        />
-        {touched.lastName && errors.lastName && <Text>{errors.lastName}</Text>}
-        <TextInput
-          onChangeText={handleChange('email')}
-          onBlur={handleBlur('email')}
-          value={values.email}
-          style={styles.input}
-          placeholder="email"
-          keyboardType="email-address"
-        />
-        {touched.email && errors.email && <Text>{errors.email}</Text>}
-        <TextInput
-          onChangeText={handleChange('password')}
-          onBlur={handleBlur('password')}
-          value={values.password}
-          style={styles.input}
-          placeholder="password"
-          secureTextEntry={true}
-        />
-        {touched.password && errors.password && <Text>{errors.password}</Text>}
-        <Button
-          onPress={() => handleSubmit()}
-          title="sign up"
-          disabled={isLoading}
-        />
-        {isLoading && <ActivityIndicator size="small" animating={isLoading} />}
-        {isError && (
-          <Text>
-            {error ? (error.response ? error.response.data.message : '') : ''}
-          </Text>
-        )}
+    <HideKeyboard>
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome to Socialyze</Text>
+        <View>
+          <TextInput
+            title="first Name"
+            onChangeText={handleChange('firstName')}
+            onBlur={handleBlur('firstName')}
+            value={values.firstName}
+            placeholder="First Name"
+          />
+          {touched.firstName && errors.firstName && (
+            <Text>{errors.firstName}</Text>
+          )}
+          <TextInput
+            title="last Name"
+            onChangeText={handleChange('lastName')}
+            onBlur={handleBlur('lastName')}
+            value={values.lastName}
+            placeholder="Last Name"
+          />
+          {touched.lastName && errors.lastName && (
+            <Text>{errors.lastName}</Text>
+          )}
+          <TextInput
+            title="email"
+            onChangeText={handleChange('email')}
+            onBlur={handleBlur('email')}
+            value={values.email}
+            placeholder="email"
+            keyboardType="email-address"
+          />
+          {touched.email && errors.email && <Text>{errors.email}</Text>}
+          <TextInput
+            title="password"
+            onChangeText={handleChange('password')}
+            onBlur={handleBlur('password')}
+            value={values.password}
+            placeholder="password"
+            secureTextEntry={true}
+          />
+          {touched.password && errors.password && (
+            <Text>{errors.password}</Text>
+          )}
+          <Button
+            onPress={() => handleSubmit()}
+            title="sign up"
+            disabled={isLoading}
+          />
+          {isLoading && (
+            <ActivityIndicator size="small" animating={isLoading} />
+          )}
+          {isError && (
+            <Text>
+              {error ? (error.response ? error.response.data.message : '') : ''}
+            </Text>
+          )}
+          <View style={styles.separator}></View>
+          <Text style={{ textAlign: 'center' }}>Already have an account?</Text>
+          <Button
+            onPress={() => navigation.navigate('Signin')}
+            title="log in"
+          />
+        </View>
       </View>
-      <View style={styles.separator}></View>
-      <Text>Already have an account?</Text>
-      <Button onPress={() => navigation.navigate('Signin')} title="log in" />
-    </View>
+    </HideKeyboard>
   );
 }
 
@@ -107,7 +124,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   separator: {

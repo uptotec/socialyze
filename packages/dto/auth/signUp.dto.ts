@@ -10,7 +10,7 @@ import {
 
 export class signUpStep2Dto {
   @IsNotEmpty()
-  @Length(100, 280)
+  @Length(30, 280)
   bio: string;
 
   @IsNotEmpty()

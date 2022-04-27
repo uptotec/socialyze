@@ -2,6 +2,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import * as React from 'react';
+import { Image } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -19,6 +20,12 @@ export default function BottomTabNavigator() {
       initialRouteName="Home"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
+        headerTitle: () => (
+          <Image
+            source={require('../assets/images/logo.png')}
+            style={{ width: 160, height: 35 }}
+          />
+        ),
       }}
     >
       <BottomTab.Screen

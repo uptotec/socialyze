@@ -1,4 +1,4 @@
-import { Button, TextInput, StyleSheet, Image } from 'react-native';
+import { Button as SystemButton, StyleSheet, Image } from 'react-native';
 import { useFormik } from 'formik';
 import { FacultyResponseDto, signUpStep2DtoScreen1 } from 'dto';
 import { createValidator } from 'class-validator-formik';
@@ -9,7 +9,13 @@ import SearchableDropdown from 'react-native-searchable-dropdown';
 import { AxiosError } from 'axios';
 import { useDebounce } from 'use-debounce';
 
-import { View, Text } from '../../components/basic/Themed';
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  HideKeyboard,
+} from '../../components/basic/Themed';
 import { searchFacultiesApi } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -78,70 +84,95 @@ export default function SignUpStep2Screen({ navigation }: Props) {
   );
 
   return (
-    <View style={styles.container}>
-      <Text>SignupStep2 Screen</Text>
-      {values.photo && (
+    <HideKeyboard>
+      <View style={styles.container}>
+        <Text style={styles.title}>Complete Your Profile</Text>
         <Image
-          source={{ uri: values.photo.uri }}
-          style={{ width: 150, height: 150 }}
+          source={
+            values.photo
+              ? { uri: values.photo.uri }
+              : require('../../assets/images/user.png')
+          }
+          style={{
+            width: 80,
+            height: 80,
+            borderRadius: 150 / 2,
+            overflow: 'hidden',
+          }}
         />
-      )}
-      <Button title="Pick Profile Photo" onPress={pickImage} />
-      <View>
-        <TextInput
-          onChangeText={handleChange('bio')}
-          onBlur={handleBlur('bio')}
-          value={values.bio}
-          style={{ ...styles.input, height: 50 }}
-          placeholder="Bio"
-          multiline={true}
-          maxLength={280}
-          returnKeyType="done"
-          blurOnSubmit={true}
-          enablesReturnKeyAutomatically={true}
+
+        <SystemButton
+          title="Pick Profile Photo"
+          onPress={pickImage}
+          color="#02e390"
         />
-        {touched.bio && errors.bio && <Text>{errors.bio}</Text>}
-        <View style={styles.dateView}>
-          <Text>Birthday: </Text>
-          <RNdateTimePicker
-            style={{ width: 100 }}
-            value={values.birthDay ? new Date(values.birthDay) : new Date()}
-            onChange={(_e: any, date: Date | undefined) =>
-              setFieldValue('birthDay', date?.toISOString())
-            }
-            mode="date"
+        <View>
+          <TextInput
+            title="bio"
+            onChangeText={handleChange('bio')}
+            onBlur={handleBlur('bio')}
+            value={values.bio}
+            style={{ height: 50 }}
+            placeholder="Bio"
+            multiline={true}
+            maxLength={280}
+            returnKeyType="done"
+            blurOnSubmit={true}
+            enablesReturnKeyAutomatically={true}
           />
+          {touched.bio && errors.bio && <Text>{errors.bio}</Text>}
+          <View style={styles.dateView}>
+            <Text style={styles.small}>Birthday: </Text>
+            <RNdateTimePicker
+              style={{ width: 100 }}
+              value={values.birthDay ? new Date(values.birthDay) : new Date()}
+              onChange={(_e: any, date: Date | undefined) =>
+                setFieldValue('birthDay', date?.toISOString())
+              }
+              mode="date"
+            />
+          </View>
+          <Text style={styles.small}>faculty</Text>
+          <SearchableDropdown
+            onItemSelect={(item) => {
+              setFieldValue('faculty', item.id);
+              setFieldValue('facultyName', item.name);
+            }}
+            itemStyle={{
+              padding: 10,
+              marginTop: 2,
+              backgroundColor: '#ddd',
+              borderColor: '#bbb',
+              borderWidth: 1,
+              borderRadius: 5,
+            }}
+            containerStyle={{
+              maxWidth: 500,
+              marginVertical: 10,
+            }}
+            textInputStyle={{
+              borderRadius: 15,
+              borderWidth: 1,
+              borderColor: '#d9d9d9',
+              paddingVertical: 12,
+              paddingHorizontal: 10,
+            }}
+            onTextChange={(text) => setFieldValue('facultyName', text)}
+            items={facilities}
+            itemsContainerStyle={{ maxHeight: 140 }}
+            textInputProps={{
+              placeholder: 'faculty',
+              value: values.facultyName,
+            }}
+            listProps={{
+              nestedScrollEnabled: true,
+            }}
+          />
+
+          <Button onPress={() => handleSubmit()} title="Continue" />
         </View>
-
-        <SearchableDropdown
-          onItemSelect={(item) => {
-            setFieldValue('faculty', item.id);
-            setFieldValue('facultyName', item.name);
-          }}
-          containerStyle={{ maxWidth: 500, marginVertical: 10 }}
-          onTextChange={(text) => setFieldValue('facultyName', text)}
-          items={facilities}
-          itemStyle={{
-            padding: 10,
-            marginTop: 2,
-            backgroundColor: '#ddd',
-            borderColor: '#bbb',
-            borderWidth: 1,
-            borderRadius: 5,
-          }}
-          itemsContainerStyle={{ maxHeight: 140 }}
-          textInputProps={{
-            placeholder: 'faculty',
-            value: values.facultyName,
-          }}
-          listProps={{
-            nestedScrollEnabled: true,
-          }}
-        />
-
-        <Button onPress={() => handleSubmit()} title="Continue" />
       </View>
-    </View>
+    </HideKeyboard>
   );
 }
 
@@ -149,7 +180,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 50,
+    paddingTop: 15,
   },
   dateView: {
     flexDirection: 'row',
@@ -158,6 +189,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    margin: 10,
   },
   separator: {
     marginVertical: 10,
@@ -167,5 +199,10 @@ const styles = StyleSheet.create({
   input: {
     width: 250,
     height: 30,
+  },
+  small: {
+    color: '#d9d9d9',
+    marginLeft: 7,
+    marginTop: 5,
   },
 });

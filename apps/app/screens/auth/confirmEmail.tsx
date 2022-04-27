@@ -1,10 +1,16 @@
-import { Button, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { StyleSheet, ActivityIndicator } from 'react-native';
 import { useFormik } from 'formik';
 import { ConfirmMailDto } from 'dto';
 import { createValidator } from 'class-validator-formik';
 import { useMutation } from 'react-query';
 
-import { View, Text } from '../../components/basic/Themed';
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  HideKeyboard,
+} from '../../components/basic/Themed';
 import { confirmMailApi } from '../../api/auth';
 import { useAuthStore } from '../../store/auth.store';
 
@@ -26,27 +32,31 @@ export default function ConfirmMailScreen() {
     });
 
   return (
-    <View style={styles.container}>
-      <Text>ConfirmMail Screen</Text>
-      <View>
-        <TextInput
-          onChangeText={handleChange('code')}
-          onBlur={handleBlur('code')}
-          value={values.code}
-          style={styles.input}
-          placeholder="confirmation Code"
-          keyboardType="numeric"
-        />
-        {touched.code && errors.code && <Text>{errors.code}</Text>}
-        <Button
-          onPress={() => handleSubmit()}
-          title="confirm"
-          disabled={isLoading}
-        />
-        {isLoading && <ActivityIndicator size="small" animating={isLoading} />}
-        {isError && <Text>code not valid</Text>}
+    <HideKeyboard>
+      <View style={styles.container}>
+        <Text style={styles.title}>Confirm Your Email</Text>
+        <View>
+          <TextInput
+            title="confirmatin code"
+            onChangeText={handleChange('code')}
+            onBlur={handleBlur('code')}
+            value={values.code}
+            placeholder="confirmation Code"
+            keyboardType="numeric"
+          />
+          {touched.code && errors.code && <Text>{errors.code}</Text>}
+          <Button
+            onPress={() => handleSubmit()}
+            title="confirm"
+            disabled={isLoading}
+          />
+          {isLoading && (
+            <ActivityIndicator size="small" animating={isLoading} />
+          )}
+          {isError && <Text>code not valid</Text>}
+        </View>
       </View>
-    </View>
+    </HideKeyboard>
   );
 }
 
@@ -57,8 +67,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
+    margin: 10,
   },
   separator: {
     marginVertical: 10,

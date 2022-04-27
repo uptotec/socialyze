@@ -1,4 +1,4 @@
-import { Button, StyleSheet, ActivityIndicator } from 'react-native';
+import { StyleSheet, ActivityIndicator } from 'react-native';
 import { useFormik } from 'formik';
 import { signUpStep2Dto, FacultyResponseDto } from 'dto';
 import { createValidator } from 'class-validator-formik';
@@ -8,7 +8,12 @@ import SearchableDropdown from 'react-native-searchable-dropdown';
 import { AxiosError } from 'axios';
 import { useDebounce } from 'use-debounce';
 
-import { View, Text } from '../../components/basic/Themed';
+import {
+  View,
+  Text,
+  HideKeyboard,
+  Button,
+} from '../../components/basic/Themed';
 import constants from '../../constants/Layout';
 import { signupStep2Api } from '../../api/auth';
 import { useAuthStore } from '../../store/auth.store';
@@ -57,58 +62,67 @@ export default function SelectIntrestsScreen({ route }: Props) {
   );
 
   return (
-    <View style={styles.container}>
-      <Text>SelectIntrests Screen</Text>
-      <SearchableDropdown
-        multi={true}
-        chip={true}
-        onItemSelect={(item) => {
-          setFieldValue('interests', [...values.interests, item.id]);
-          setSelectedIntrests([...selectedIntrests, item]);
-        }}
-        onRemoveItem={(item) => {
-          const newValue = values.interests.filter(
-            (sitem) => sitem !== item.id,
-          );
-          setFieldValue('interests', [...newValue]);
-          const newlist = selectedIntrests.filter(
-            (sitem) => sitem.id !== item.id,
-          );
-          setSelectedIntrests([...newlist]);
-        }}
-        selectedItems={selectedIntrests}
-        containerStyle={{
-          marginVertical: 10,
-          width: constants.window.width * 0.8,
-        }}
-        onTextChange={(text) => setFieldValue('intestName', text)}
-        items={intrests}
-        itemStyle={{
-          padding: 10,
-          marginTop: 2,
-          backgroundColor: '#ddd',
-          borderColor: '#bbb',
-          borderWidth: 1,
-          borderRadius: 5,
-        }}
-        itemsContainerStyle={{ maxHeight: 140 }}
-        textInputProps={{
-          placeholder: 'Intrests',
-        }}
-        listProps={{
-          nestedScrollEnabled: true,
-        }}
-      />
-      <Button
-        onPress={() => handleSubmit()}
-        title="submit"
-        disabled={signupApi.isLoading}
-      />
-      {signupApi.isLoading && (
-        <ActivityIndicator size="small" animating={signupApi.isLoading} />
-      )}
-      {signupApi.isError && <Text>data not valid</Text>}
-    </View>
+    <HideKeyboard>
+      <View style={styles.container}>
+        <Text style={styles.title}>Select Your Interests</Text>
+        <SearchableDropdown
+          multi={true}
+          chip={true}
+          onItemSelect={(item) => {
+            setFieldValue('interests', [...values.interests, item.id]);
+            setSelectedIntrests([...selectedIntrests, item]);
+          }}
+          onRemoveItem={(item) => {
+            const newValue = values.interests.filter(
+              (sitem) => sitem !== item.id,
+            );
+            setFieldValue('interests', [...newValue]);
+            const newlist = selectedIntrests.filter(
+              (sitem) => sitem.id !== item.id,
+            );
+            setSelectedIntrests([...newlist]);
+          }}
+          selectedItems={selectedIntrests}
+          containerStyle={{
+            marginVertical: 10,
+            width: constants.window.width * 0.8,
+          }}
+          onTextChange={(text) => setFieldValue('intestName', text)}
+          items={intrests}
+          itemStyle={{
+            padding: 10,
+            marginTop: 2,
+            borderColor: '#d9d9d9',
+            borderWidth: 1,
+            borderRadius: 5,
+          }}
+          itemsContainerStyle={{ maxHeight: 140 }}
+          textInputProps={{
+            placeholder: 'Intrests',
+          }}
+          listProps={{
+            nestedScrollEnabled: true,
+          }}
+          textInputStyle={{
+            borderRadius: 15,
+            borderWidth: 1,
+            borderColor: '#d9d9d9',
+            paddingVertical: 12,
+            paddingHorizontal: 10,
+          }}
+        />
+        <Button
+          onPress={() => handleSubmit()}
+          title="submit"
+          style={{ width: 250 }}
+          disabled={signupApi.isLoading}
+        />
+        {signupApi.isLoading && (
+          <ActivityIndicator size="small" animating={signupApi.isLoading} />
+        )}
+        {signupApi.isError && <Text>data not valid</Text>}
+      </View>
+    </HideKeyboard>
   );
 }
 
@@ -134,5 +148,10 @@ const styles = StyleSheet.create({
   input: {
     width: 250,
     height: 30,
+  },
+  small: {
+    color: '#d9d9d9',
+    marginLeft: 7,
+    marginBottom: 5,
   },
 });

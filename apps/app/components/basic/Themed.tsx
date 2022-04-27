@@ -3,9 +3,20 @@
  * https://docs.expo.io/guides/color-schemes/
  */
 
-import { Text as DefaultText, View as DefaultView } from 'react-native';
+import { ReactChild } from 'react';
+import {
+  Keyboard,
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  Text as DefaultText,
+  TouchableWithoutFeedback,
+  View as DefaultView,
+  TextInput as DefaultTextInput,
+} from 'react-native';
 
 import Colors from '../../constants/Colors';
+import Layout from '../../constants/Layout';
 import useColorScheme from '../../hooks/useColorScheme';
 
 export function useThemeColor(
@@ -46,3 +57,71 @@ export function View(props: ViewProps) {
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
 }
+
+export function Button(props: PressableProps & { title: string }) {
+  const { onPress, title, style, ...otherButtonProps } = props;
+  return (
+    <Pressable
+      style={{ ...styles.button, ...(style as any) }}
+      onPress={onPress}
+      {...otherButtonProps}
+    >
+      <Text style={styles.text}>{title}</Text>
+    </Pressable>
+  );
+}
+
+export const HideKeyboard = ({ children }: { children: ReactChild }) => (
+  <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    {children}
+  </TouchableWithoutFeedback>
+);
+
+export function TextInput({
+  title,
+  style,
+  ...otherProps
+}: DefaultTextInput['props'] & { title: string }) {
+  return (
+    <View style={{ marginVertical: 7 }}>
+      <Text style={styles.small}>{title}</Text>
+      <DefaultTextInput
+        style={{ ...styles.input, ...(style as any) }}
+        {...otherProps}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 15,
+    elevation: 3,
+    backgroundColor: '#00fe9f',
+    marginVertical: 20,
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: 'bold',
+    letterSpacing: 0.25,
+  },
+  input: {
+    width: Layout.window.width * 0.7,
+    height: 40,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#d9d9d9',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+  },
+  small: {
+    color: '#d9d9d9',
+    marginLeft: 7,
+    marginBottom: 5,
+  },
+});
